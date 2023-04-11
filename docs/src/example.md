@@ -21,12 +21,13 @@ function run()
     k0 = 2.0 * ke
     ww = sqrt(1.0 + k0^2.0) # w0
     ata = 0.2
+    vth = 0.17
 
     mesh = Mesh(xmin, xmax, nx, vmin, vmax, nv)
     adv  = PSMAdvection(mesh)
     
     E1, E2, E3, A2, A3 = initialfields( mesh, a, ww, ke, k0)
-    f0, f1, f2, f3 = initialfunction(mesh, a, ke, ata)
+    f0, f1, f2, f3 = initialfunction(mesh, a, ke, vth,  ata)
 
     results = Diagnostics(f0, f2, f3, E1, E2, E3, A2, A3, mesh, h_int)
 
