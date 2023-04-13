@@ -4,6 +4,12 @@
 [![Build Status](https://github.com/JuliaVlasov/VectorSpinVlasovMaxwell1D1V.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/JuliaVlasov/VectorSpinVlasovMaxwell1D1V.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Coverage](https://codecov.io/gh/JuliaVlasov/VectorSpinVlasovMaxwell1D1V.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/JuliaVlasov/VectorSpinVlasovMaxwell1D1V.jl)
 
+## Cite
+
+Nicolas Crouseilles, Paul-Antoine Hervieux, Xue Hong, Giovanni Manfredi. Vlasov-Maxwell equations with spin effects. 2023. [hal-03960201](https://hal.inria.fr/hal-03960201/)
+
+## Installation
+
 ```bash
 git clone https://github.com/JuliaVlasov/VectorSpinVlasovMaxwell1D1V.jl.git
 cd VectorSpinVlasovMaxwell1D1V.jl
