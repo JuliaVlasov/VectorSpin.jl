@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-import Pkg
-Pkg.activate("/home/pnavaro/VectorSpinVlasovMaxwell1D1V.jl")
-
-using Revise
-
 using CSV
 using DataFrames
 using Plots
@@ -15,17 +10,17 @@ using SpinGEMPIC
 using Statistics
 import GEMPIC: OneDGrid, Maxwell1DFEM
 import GEMPIC: eval_uniform_periodic_spline_curve
-using VectorSpinVlasovMaxwell1D1V
+using VectorSpin
 import GEMPIC: l2projection!
 
-import VectorSpinVlasovMaxwell1D1V: initialfunction
-import VectorSpinVlasovMaxwell1D1V: initialfields
-import VectorSpinVlasovMaxwell1D1V: diagnostics
-import VectorSpinVlasovMaxwell1D1V: H2fh!
-import VectorSpinVlasovMaxwell1D1V: He!
-import VectorSpinVlasovMaxwell1D1V: HAA!
-import VectorSpinVlasovMaxwell1D1V: H3fh!
-import VectorSpinVlasovMaxwell1D1V: H1f!
+import VectorSpin: initialfunction
+import VectorSpin: initialfields
+import VectorSpin: diagnostics
+import VectorSpin: H2fh!
+import VectorSpin: He!
+import VectorSpin: HAA!
+import VectorSpin: H3fh!
+import VectorSpin: H1f!
 
 function compute_rho(mesh::Mesh, f::Array{Float64,2})
 

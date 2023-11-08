@@ -1,4 +1,4 @@
-name = "VectorSpinVlasovMaxwell1D1V"
+name = "VectorSpin"
 uuid = "bf90e979-ab1d-4d24-837a-68780c571cd7"
 authors = ["Julia Vlasov"]
 version = "0.2.0"

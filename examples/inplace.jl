@@ -5,15 +5,15 @@ using TimerOutputs
 using MAT
 using JLD2
 
-import VectorSpinVlasovMaxwell1D1V: initialfields
-import VectorSpinVlasovMaxwell1D1V: initialfunction
-import VectorSpinVlasovMaxwell1D1V: numeint
-import VectorSpinVlasovMaxwell1D1V: diagnostics
-import VectorSpinVlasovMaxwell1D1V: H2fh!
-import VectorSpinVlasovMaxwell1D1V: He!
-import VectorSpinVlasovMaxwell1D1V: HAA!
-import VectorSpinVlasovMaxwell1D1V: H3fh!
-import VectorSpinVlasovMaxwell1D1V: H1f!
+import VectorSpin: initialfields
+import VectorSpin: initialfunction
+import VectorSpin: numeint
+import VectorSpin: diagnostics
+import VectorSpin: H2fh!
+import VectorSpin: He!
+import VectorSpin: HAA!
+import VectorSpin: H3fh!
+import VectorSpin: H1f!
 
 const to = TimerOutput()
 

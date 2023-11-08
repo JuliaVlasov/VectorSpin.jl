@@ -1,8 +1,8 @@
 ```@meta
-CurrentModule = VectorSpinVlasovMaxwell1D1V
+CurrentModule = VectorSpin
 ```
 
-# VectorSpinVlasovMaxwell1D1V
+# VectorSpin
 
 ## Scalar spin laser plasma model
 
@@ -14,7 +14,7 @@ Particle distribution function ``f(x, p, {\mathbf s}, t)``,
 - ``{\mathbf A} = (A_x, {\mathbf A}_\perp) = (0, A_y, A_z)``, 
 - ``{\mathbf B} =\nabla\times{\mathbf  A} = (0,- \partial_xA_z,  \partial_xA_y)``.
 
-The scalar spin Vlasov--Maxwell  system is:
+The scalar spin Vlasov-Maxwell  system is:
 
 ```math
 \left\{

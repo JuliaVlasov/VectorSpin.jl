@@ -1,14 +1,14 @@
-using VectorSpinVlasovMaxwell1D1V
+using VectorSpin
 using FFTW
 using MAT
 using Test
 
-import VectorSpinVlasovMaxwell1D1V: initialfunction, initialfields
-import VectorSpinVlasovMaxwell1D1V: H2fh!
-import VectorSpinVlasovMaxwell1D1V: He!
-import VectorSpinVlasovMaxwell1D1V: HAA!
-import VectorSpinVlasovMaxwell1D1V: H3fh!
-import VectorSpinVlasovMaxwell1D1V: H1f!
+import VectorSpin: initialfunction, initialfields
+import VectorSpin: H2fh!
+import VectorSpin: He!
+import VectorSpin: HAA!
+import VectorSpin: H3fh!
+import VectorSpin: H1f!
 
 const M = 129   # partition of x
 const N = 129   # partition of v

@@ -3,7 +3,7 @@
 ```julia
 using Plots
 using FFTW
-using VectorSpinVlasovMaxwell1D1V
+using VectorSpin
 ```
 
 ```math

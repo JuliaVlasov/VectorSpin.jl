@@ -1,4 +1,4 @@
-module VectorSpinVlasovMaxwell1D1V
+module VectorSpin
 
 using DocStringExtensions
 using FFTW

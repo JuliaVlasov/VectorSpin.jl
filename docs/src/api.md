@@ -1,14 +1,14 @@
 ```@meta
-CurrentModule = VectorSpinVlasovMaxwell1D1V
+CurrentModule = VectorSpin
 ```
 
-# VectorSpinVlasovMaxwell1D1V
+# VectorSpin
 
-Documentation for [VectorSpinVlasovMaxwell1D1V](https://github.com/JuliaVlasov/VectorSpinVlasovMaxwell1D1V.jl).
+Documentation for [VectorSpin](https://github.com/JuliaVlasov/VectorSpin.jl).
 
 ```@index
 ```
 
 ```@autodocs
-Modules = [VectorSpinVlasovMaxwell1D1V]
+Modules = [VectorSpin]
 ```

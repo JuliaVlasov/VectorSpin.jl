@@ -1,11 +1,11 @@
-import VectorSpinVlasovMaxwell1D1V: bspline
+import VectorSpin: bspline
 
 using FFTW
 using LinearAlgebra
 using Plots
 using ProgressMeter
 using Statistics
-using VectorSpinVlasovMaxwell1D1V
+using VectorSpin
 using SemiLagrangian
 
 """
@@ -72,16 +72,16 @@ function landau_damping(tf::Float64, nt::Int64)
   
   @showprogress 1 for it in 1:nt
         
-       VectorSpinVlasovMaxwell1D1V.advection!(f, adv_x, v, 0.5dt)
+       VectorSpin.advection!(f, adv_x, v, 0.5dt)
 
        ρ = compute_rho(mesh, f)
        e = compute_e(mesh, ρ)
         
        push!(ℰ, 0.5*log(sum(e.*e)*dx))
         
-       VectorSpinVlasovMaxwell1D1V.advection!(f, adv_v, e, dt)
+       VectorSpin.advection!(f, adv_v, e, dt)
     
-       VectorSpinVlasovMaxwell1D1V.advection!(f, adv_x, v, 0.5dt)
+       VectorSpin.advection!(f, adv_x, v, 0.5dt)
         
   end
                   

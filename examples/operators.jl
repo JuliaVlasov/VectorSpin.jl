@@ -2,16 +2,16 @@ using Plots
 using FFTW
 using MAT
 using ProgressMeter
-using VectorSpinVlasovMaxwell1D1V
+using VectorSpin
 
-import VectorSpinVlasovMaxwell1D1V: initialfunction
-import VectorSpinVlasovMaxwell1D1V: initialfields
-import VectorSpinVlasovMaxwell1D1V: diagnostics
-import VectorSpinVlasovMaxwell1D1V: H2fh!
-import VectorSpinVlasovMaxwell1D1V: He!
-import VectorSpinVlasovMaxwell1D1V: HAA!
-import VectorSpinVlasovMaxwell1D1V: H3fh!
-import VectorSpinVlasovMaxwell1D1V: H1f!
+import VectorSpin: initialfunction
+import VectorSpin: initialfields
+import VectorSpin: diagnostics
+import VectorSpin: H2fh!
+import VectorSpin: He!
+import VectorSpin: HAA!
+import VectorSpin: H3fh!
+import VectorSpin: H1f!
 
 function operators()
 
