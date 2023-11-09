@@ -107,3 +107,81 @@ function step!(f0, f1, f2, f3, E2, A2, op, dt, h_int)
         E2[i] += dt * h_int * 1im * k[i] * sum(view(op.f3, i, :)) * dv
     end
 end
+
+
+
+export H3fh!
+
+"""
+$(SIGNATURES)
+
+compute the subsystem Hs3
+"""
+function H3fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
+    K_xc = tiK
+    n_i = 1.0
+    mub = 0.3386
+    savevaluef0 = copy(f0)
+    savevaluef3 = copy(f3)
+
+    #####################################################
+    partialB3 = zeros(ComplexF64, M)
+    partial2S3 = zeros(ComplexF64, M)
+    value1 = 1:(M-1)÷2+1 #M odd
+    value2 = (M-1)÷2+2:M
+    B30 = -K_xc * n_i * 0.5 * S3
+    fS3 = fft(S3)
+    partialB3[value1] =
+        (-((K_xc * n_i * 0.5 * 2pi * 1im / L * (value1 .- 1))) .* fS3[value1])
+    partialB3[value2] =
+        (-((K_xc * n_i * 0.5 * 2pi * 1im / L * (value2 .- M .- 1))) .* fS3[value2])
+    partialB3 = real(ifft(partialB3))
+    partial2S3[value1] .= -((2pi / L .* (value1 .- 1)) .^ 2) .* fS3[value1]
+    partial2S3[value2] .= -((2pi / L .* (value2 .- M .- 1)) .^ 2) .* fS3[value2]
+    partial2S3 .= real(ifft(partial2S3))
+    translatorv1 = zeros(N, M)
+    translatorv2 = zeros(N, M)
+    for i = 1:M
+        translatorv1[:, i] .= (t * partialB3[i] * mub) 
+        translatorv2[:, i] .= -translatorv1[:, i]
+    end
+
+    #translate in the direction of v
+    f0t = zeros(N, M)
+    f1t = zeros(N, M)
+    f2t = zeros(N, M)
+    f3t = zeros(N, M)
+    u1 = zeros(N, M)#0.5f0+0.5f3
+    u2 = zeros(N, M)#0.5f0-0.5f3
+    S1t = zeros(M)
+    S2t = zeros(M)
+    for i = 1:M
+        u1[:, i] .= translation(
+            0.5 * savevaluef0[:, i] .+ 0.5 * savevaluef3[:, i],
+            N,
+            translatorv1[:, i],
+            H,
+        )
+        u2[:, i] .= translation(
+            0.5 * savevaluef0[:, i] .- 0.5 * savevaluef3[:, i],
+            N,
+            translatorv2[:, i],
+            H,
+        )
+        f0t[:, i] .= u1[:, i] + u2[:, i]
+        f3t[:, i] .= u1[:, i] - u2[:, i]
+        f1t[:, i] .= cos(t * B30[i]) * f1[:, i] - sin(t * B30[i]) .* f2[:, i]
+        f2t[:, i] .= sin(t * B30[i]) * f1[:, i] + cos(t * B30[i]) .* f2[:, i]
+        temi = K_xc / 4 * sum(f3[:, i]) * 2H / N + 0.01475 * partial2S3[i]
+        S1t[i] = cos(t * temi) * S1[i] + sin(t * temi) * S2[i]
+        S2t[i] = -sin(t * temi) * S1[i] + cos(t * temi) * S2[i]
+    end
+    #####################################################
+
+    f0 .= f0t
+    f1 .= f1t
+    f2 .= f2t
+    f3 .= f3t
+
+    return S1t, S2t
+end
