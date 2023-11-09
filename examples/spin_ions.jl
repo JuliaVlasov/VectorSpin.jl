@@ -105,7 +105,7 @@ h1fh = matread("test/h1fh.mat")
 @test S2 ≈ vec(h1fh["S2"])
 @test S3 ≈ vec(h1fh["S3"])
 
-S1, S3 = H2fh!(f0, f1, f2, f3, S1, S2, S3, h, M, N, L, H, tildeK)
+@time S1, S3 = H2fh!(f0, f1, f2, f3, S1, S2, S3, h, M, N, L, H, tildeK)
 
 h2fh = matread("test/h2fh.mat")
 
@@ -116,7 +116,7 @@ h2fh = matread("test/h2fh.mat")
 @test S1 ≈ vec(h2fh["S1"])
 @test S3 ≈ vec(h2fh["S3"])
 
-S1, S2 = H3fh!(f0, f1, f2, f3, S1, S2, S3, h, M, N, L, H, tildeK)
+@time S1, S2 = H3fh!(f0, f1, f2, f3, S1, S2, S3, h, M, N, L, H, tildeK)
 
 h3fh = matread("test/h3fh.mat")
 
