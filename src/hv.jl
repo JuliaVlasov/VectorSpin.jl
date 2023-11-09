@@ -39,15 +39,11 @@ function Hv!(f0, f1, f2, f3, t, M, N, L, H)
 
     end
 
-    E1t = zeros(ComplexF64, M)
+    E1t = vec(sum(ff0, dims=2))
+    E1t[1] = 0.0
 
-    for i = 2:((M-1)÷2+1)
-        E1t[i] = sum(view(ff0,i,:)) * (2H / N) * (-1.0) * L / (1im * 2pi * (i - 1))
-    end
-
-    for i = ((M-1)÷2+2):M
-        k = i - M - 1
-        E1t[i] = sum(view(ff0,i, :)) * (2H / N) * (-1.0) * L / (1im * 2pi * k)
+    for i = 2:M
+        E1t[i] *= (2H / N) / (- 1im * k_fre[i])
     end
 
     ifft!(ff0, 1)
