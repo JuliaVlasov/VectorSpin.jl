@@ -127,31 +127,26 @@ function H2fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
 
     partialB2 = zeros(ComplexF64, M)
     partial2S2 = zeros(ComplexF64, M)
-    value1 = 1:(M-1)÷2+1
-    value2 = (M-1)÷2+2:M
     B20 = -K_xc * n_i * 0.5 * S2
+    k = fftfreq(M, M)
 
     f1 .=  cos.(t * B20') .* f1 .+ sin.(t * B20') .* f3
     f3 .= -sin.(t * B20') .* f1 .+ cos.(t * B20') .* f3
 
     fS2 = fft(S2)
-    partialB2[value1] =
-        (-((K_xc * n_i * 0.5 * 2pi * 1im / L * (value1 .- 1))) .* fS2[value1])
-    partialB2[value2] =
-        (-((K_xc * n_i * 0.5 * 2pi * 1im / L * (value2 .- M .- 1))) .* fS2[value2])
-    partialB2 = real(ifft(partialB2))
-    partial2S2[value1] = (-((2pi / L * (value1 .- 1)) .^ 2) .* fS2[value1])
-    partial2S2[value2] = (-((2pi / L * (value2 .- M .- 1)) .^ 2) .* fS2[value2])
-    partial2S2 .= real(ifft(partial2S2))
+
+    partialB2 .= (-((K_xc * n_i * 0.5 * 2pi * 1im / L .* k )) .* fS2)
+    ifft!(partialB2)
+    partial2S2 = (-((2pi / L * k ) .^ 2) .* fS2)
+    ifft!(partial2S2)
+
     v1 = zeros(M)
     v2 = zeros(M)
     for i = 1:M
-        v1[i] = (t * partialB2[i] * mub)
+        v1[i] = (t * real(partialB2[i]) * mub)
         v2[i] = -v1[i]
     end
 
-    f0t = zeros(N, M)
-    f2t = zeros(N, M)
     S1t = zeros(M)
     S3t = zeros(M)
 
@@ -162,15 +157,13 @@ function H2fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
     translation!(u2, v2, H)
 
     for i = 1:M
-        f0t[:, i] .= u1[:, i] .+ u2[:, i]
-        f2t[:, i] .= u1[:, i] .- u2[:, i]
-        temi = K_xc / 4 * sum(f2[:, i]) * 2H / N + 0.01475 * partial2S2[i]
+        temi = K_xc / 4 * sum(f2[:, i]) * 2H / N + 0.01475 * real(partial2S2[i])
         S1t[i] = cos(t * temi) * S1[i] - sin(t * temi) * S3[i]
         S3t[i] = sin(t * temi) * S1[i] + cos(t * temi) * S3[i]
     end
 
-    f0 .= f0t
-    f2 .= f2t
+    f0 .= u1 .+ u2
+    f2 .= u1 .- u2
 
     return S1t, S3t
 
