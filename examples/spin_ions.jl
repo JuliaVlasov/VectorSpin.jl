@@ -85,7 +85,7 @@ hv = matread("test/hv.mat")
 @test f2 ≈ hv["f2"]
 @test f3 ≈ hv["f3"]
 
-VectorSpin.He!(f0, f1, f2, f3, E1, h, M, N, H)
+@time VectorSpin.He!(f0, f1, f2, f3, E1, h, H)
 
 he = matread("test/he.mat")
 
@@ -94,7 +94,7 @@ he = matread("test/he.mat")
 @test f2 ≈ he["f2"]
 @test f3 ≈ he["f3"]
 
-S2, S3 = H1fh!(f0, f1, f2, f3, S1, S2, S3, h, M, N, L, H, tildeK)
+@time S2, S3 = H1fh!(f0, f1, f2, f3, S1, S2, S3, h, M, N, L, H, tildeK)
 
 h1fh = matread("test/h1fh.mat")
 
