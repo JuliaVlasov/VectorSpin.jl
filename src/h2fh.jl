@@ -120,13 +120,11 @@ compute the subsystem Hs2
 
 """
 function H2fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
+
     K_xc = tiK
     n_i = 1.0
     mub = 0.3386
-    savevaluef0 = copy(f0)
-    savevaluef2 = copy(f2)
 
-    #####################################################
     partialB2 = zeros(ComplexF64, M)
     partial2S2 = zeros(ComplexF64, M)
     value1 = 1:(M-1)÷2+1
@@ -141,11 +139,11 @@ function H2fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
     partial2S2[value1] = (-((2pi / L * (value1 .- 1)) .^ 2) .* fS2[value1])
     partial2S2[value2] = (-((2pi / L * (value2 .- M .- 1)) .^ 2) .* fS2[value2])
     partial2S2 .= real(ifft(partial2S2))
-    translatorv1 = zeros(N, M)
-    translatorv2 = zeros(N, M)
+    v1 = zeros(M)
+    v2 = zeros(M)
     for i = 1:M
-        translatorv1[:, i] .= (t * partialB2[i] * mub)
-        translatorv2[:, i] .= -translatorv1[:, i]
+        v1[i] = (t * partialB2[i] * mub)
+        v2[i] = -v1[i]
     end
 
 
@@ -156,23 +154,16 @@ function H2fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
     f1t = zeros(N, M)
     f2t = zeros(N, M)
     f3t = zeros(N, M)
-    u1 = zeros(N, M)#0.5f0+0.5f2
-    u2 = zeros(N, M)#0.5f0-0.5f2
     S1t = zeros(M)
     S3t = zeros(M)
+
+    u1 = 0.5 .* f0 .+ 0.5 .* f2
+    u2 = 0.5 .* f0 .- 0.5 .* f2
+
+    translation!(u1, v1, H)
+    translation!(u2, v2, H)
+
     for i = 1:M
-        u1[:, i] = translation(
-            (0.5 * savevaluef0[:, i] + 0.5 * savevaluef2[:, i]),
-            N,
-            translatorv1[:, i],
-            H,
-        )
-        u2[:, i] = translation(
-            (0.5 * savevaluef0[:, i] - 0.5 * savevaluef2[:, i]),
-            N,
-            translatorv2[:, i],
-            H,
-        )
         f0t[:, i] .= u1[:, i] .+ u2[:, i]
         f2t[:, i] .= u1[:, i] .- u2[:, i]
         f1t[:, i] .= cos(t * B20[i]) .* f1[:, i] .+ sin(t * B20[i]) .* f3[:, i]
