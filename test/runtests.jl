@@ -1,11 +1,5 @@
 using Test
 using VectorSpin
 
-@testset "Spin Ions" begin
-
-    include("ions.jl")
-
-end
-
-
+include("ions.jl")
 include("vlasov-maxwell.jl")
