@@ -21,7 +21,7 @@ const ww = sqrt(1.0 + k0^2.0) # w0
 const ata = 0.2
 const kk = 0.17 # v_th
 
-@testset "Vlasov-Maxwell Version 2" begin
+@testset "Vlasov-Maxwell Version 1" begin
 
     E1, E2, E3, A2, A3 = initialfields(H, L, N, M, a, ww, kkk, k0)
     f0, f1, f2, f3 = initialfunction(H, L, N, M, a, kkk, ata)
