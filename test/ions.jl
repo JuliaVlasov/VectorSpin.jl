@@ -82,7 +82,7 @@ using MAT
     end
     
     # Lie splitting
-    E1 = Hv!(f0, f1, f2, f3, h, M, N, L, H)
+    E1 .= Hv!(f0, f1, f2, f3, h, M, N, L, H)
     
     hv = matread("hv.mat")
     
@@ -92,7 +92,7 @@ using MAT
     @test f2 ≈ hv["f2"]
     @test f3 ≈ hv["f3"]
     
-    VectorSpin.He!(f0, f1, f2, f3, E1, h, M, N, H)
+    VectorSpin.He!(f0, f1, f2, f3, E1, h, H)
     
     he = matread("he.mat")
     
