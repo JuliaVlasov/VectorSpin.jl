@@ -130,6 +130,10 @@ function H2fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
     value1 = 1:(M-1)÷2+1
     value2 = (M-1)÷2+2:M
     B20 = -K_xc * n_i * 0.5 * S2
+
+    f1 .=  cos.(t * B20') .* f1 .+ sin.(t * B20') .* f3
+    f3 .= -sin.(t * B20') .* f1 .+ cos.(t * B20') .* f3
+
     fS2 = fft(S2)
     partialB2[value1] =
         (-((K_xc * n_i * 0.5 * 2pi * 1im / L * (value1 .- 1))) .* fS2[value1])
@@ -146,14 +150,8 @@ function H2fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
         v2[i] = -v1[i]
     end
 
-
-
-    #####################################################
-    #translate in the direction of v
     f0t = zeros(N, M)
-    f1t = zeros(N, M)
     f2t = zeros(N, M)
-    f3t = zeros(N, M)
     S1t = zeros(M)
     S3t = zeros(M)
 
@@ -166,17 +164,13 @@ function H2fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
     for i = 1:M
         f0t[:, i] .= u1[:, i] .+ u2[:, i]
         f2t[:, i] .= u1[:, i] .- u2[:, i]
-        f1t[:, i] .= cos(t * B20[i]) .* f1[:, i] .+ sin(t * B20[i]) .* f3[:, i]
-        f3t[:, i] .= -sin(t * B20[i]) .* f1[:, i] .+ cos(t * B20[i]) .* f3[:, i]
         temi = K_xc / 4 * sum(f2[:, i]) * 2H / N + 0.01475 * partial2S2[i]
         S1t[i] = cos(t * temi) * S1[i] - sin(t * temi) * S3[i]
         S3t[i] = sin(t * temi) * S1[i] + cos(t * temi) * S3[i]
     end
 
     f0 .= f0t
-    f1 .= f1t
     f2 .= f2t
-    f3 .= f3t
 
     return S1t, S3t
 
