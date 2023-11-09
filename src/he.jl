@@ -55,3 +55,27 @@ function step!(f0, f1, f2, f3, E1, E2, E3, A2, A3, op::HeOperator, dt)
     advection!(f3, op.adv, op.e, dt)
 
 end
+
+
+"""
+$(SIGNATURES)
+
+subsystem for He:
+
+f_t-Ef_v=0;
+
+"""
+function He!(f0, f1, f2, f3, E1, t, M :: Int, N :: Int, H)
+
+    e = t .* real(ifft(E1))
+
+    # translate in the direction of v1
+
+    for j = 1:M
+        f0[:, j] .= translation(f0[:, j], N, e[j] .* ones(N), H)
+        f1[:, j] .= translation(f1[:, j], N, e[j] .* ones(N), H)
+        f2[:, j] .= translation(f2[:, j], N, e[j] .* ones(N), H)
+        f3[:, j] .= translation(f3[:, j], N, e[j] .* ones(N), H)
+    end
+
+end
