@@ -20,4 +20,10 @@ include("haa.jl")
 include("h3fh.jl")
 include("h1f.jl")
 
+include("initial.jl")
+include("integrate.jl")
+include("h1fh.jl")
+include("hv.jl")
+include("recover.jl")
+
 end
