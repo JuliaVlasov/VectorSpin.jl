@@ -28,7 +28,7 @@ function Hv!(f0, f1, f2, f3, t, M, N, L, H)
 
     k_fre = fftfreq(M, M) .* 2π ./ L
 
-    for j in eachindex(k_fre), i in eachindex(v)
+    for i in eachindex(v), j in eachindex(k_fre)
 
         expv = exp(- 1im * k_fre[j] * v[i] * t)
 
