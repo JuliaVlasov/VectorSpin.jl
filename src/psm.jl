@@ -67,7 +67,7 @@ function advection!(df, adv::PSMAdvection, v, dt)
     nv::Int = adv.mesh.nv
     dv::Float64 = adv.mesh.dv
 
-    @inbounds for j = eachindex(v)
+    @inbounds for j in eachindex(v)
 
         adv.c[begin] = df[1, j]
         for i = 2:nv
@@ -83,7 +83,7 @@ function advection!(df, adv::PSMAdvection, v, dt)
             adv.b[i] = (-1)^i * 2 * sum(view(adv.d, 2:i))
         end
         adv.b[begin] = 0
-        for i in 1:nv-1
+        for i = 1:nv-1
             adv.a[i] = 1 / 2 * (adv.b[i+1] - adv.b[i])
         end
         adv.a[end] = -1 / 2 * adv.b[end]
@@ -92,7 +92,7 @@ function advection!(df, adv::PSMAdvection, v, dt)
 
         for i = 1:nv
 
-            beta :: Float64 = i - alpha
+            beta::Float64 = i - alpha
             newbeta = beta - nv * floor(Int, beta / nv)
 
             if newbeta >= 1.0
@@ -103,7 +103,7 @@ function advection!(df, adv::PSMAdvection, v, dt)
                 k = 1 - newbeta
             end
 
-            l1 = mod1(l+1,nv)
+            l1 = mod1(l + 1, nv)
             k1 = 1 - k
             k2 = k1 * k1
             k3 = k2 * k1

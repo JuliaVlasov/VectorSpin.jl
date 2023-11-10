@@ -76,9 +76,9 @@ $(SIGNATURES)
 """
 function step!(f0, f1, f2, f3, E2, E3, A2, A3, op::HAAOperator, dt)
 
-    nx :: Int = op.adv.mesh.nx
-    kx :: Vector{Float64} = op.adv.mesh.kx
-    dv :: Float64 = op.adv.mesh.dv
+    nx::Int = op.adv.mesh.nx
+    kx::Vector{Float64} = op.adv.mesh.kx
+    dv::Float64 = op.adv.mesh.dv
 
     op.dA2 .= 1im .* kx .* A2
     ifft!(op.dA2)
@@ -87,7 +87,7 @@ function step!(f0, f1, f2, f3, E2, E3, A2, A3, op::HAAOperator, dt)
     op.A2 .= real(ifft(A2))
     op.A3 .= real(ifft(A3))
 
-    op.delta .= - real(op.dA2) .* op.A2 .- real(op.dA3) .* op.A3
+    op.delta .= -real(op.dA2) .* op.A2 .- real(op.dA3) .* op.A3
 
     @inbounds for i = 2:nx
         E2[i] += dt * kx[i]^2 * A2[i]
@@ -95,7 +95,7 @@ function step!(f0, f1, f2, f3, E2, E3, A2, A3, op::HAAOperator, dt)
     end
 
     @inbounds for i = 1:nx
-        s :: Float64 = sum(view(f0, :, i))
+        s::Float64 = sum(view(f0, :, i))
         op.A2[i] = dv * op.A2[i] * s
         op.A3[i] = dv * op.A3[i] * s
     end

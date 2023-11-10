@@ -14,7 +14,7 @@ end
 
 function f(x, v, kx, α; σ = 0.17)
 
-    return exp(- 0.5 * v^2 / σ^2) * (1 + α * cos(kx * x)) / sqrt(2π) / σ
+    return exp(-0.5 * v^2 / σ^2) * (1 + α * cos(kx * x)) / sqrt(2π) / σ
 
 end
 
@@ -29,8 +29,8 @@ $(SIGNATURES)
 function initialfunction(H, L, N, M, a, frequency, ata)
 
 
-    x = (0:(M-1)) .* L ./ M 
-    v = (1:N) .* 2 .* H ./ N .- H 
+    x = (0:(M-1)) .* L ./ M
+    v = (1:N) .* 2 .* H ./ N .- H
 
     # spin related coefficient
     # 5 nodes in each cell in v direction
@@ -71,7 +71,7 @@ function initialfunction(H, L, N, M, a, frequency, ata)
 
 end
 
-function initialfunction(mesh :: Mesh, α, kx, σ, ata)
+function initialfunction(mesh::Mesh, α, kx, σ, ata)
 
     xmin, xmax = mesh.xmin, mesh.xmax
     vmin, vmax = mesh.vmin, mesh.vmax
@@ -89,7 +89,7 @@ function initialfunction(mesh :: Mesh, α, kx, σ, ata)
             v2 = mesh.v[i] - dv * 0.75
             v3 = mesh.v[i] - dv * 0.50
             v4 = mesh.v[i] - dv * 0.25
-            v5 = mesh.v[i] 
+            v5 = mesh.v[i]
 
             y1 = f(mesh.x[k], v1, kx, α, σ = σ)
             y2 = f(mesh.x[k], v2, kx, α, σ = σ)
@@ -97,7 +97,7 @@ function initialfunction(mesh :: Mesh, α, kx, σ, ata)
             y4 = f(mesh.x[k], v4, kx, α, σ = σ)
             y5 = f(mesh.x[k], v5, kx, α, σ = σ)
 
-            f0[i,k] = (7y1 + 32y2 + 12y3 + 32y4 + 7y5) / 90
+            f0[i, k] = (7y1 + 32y2 + 12y3 + 32y4 + 7y5) / 90
         end
     end
 

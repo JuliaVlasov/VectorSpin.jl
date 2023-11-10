@@ -9,7 +9,7 @@ function H1f!(f0, f1, f2, f3, E1, t, L, H)
     ff1 = complex(f1')
     ff2 = complex(f2')
     ff3 = complex(f3')
-    
+
     fft!(ff0, 1)
     fft!(ff1, 1)
     fft!(ff2, 1)
@@ -18,10 +18,10 @@ function H1f!(f0, f1, f2, f3, E1, t, L, H)
     k = [0:(M-1)÷2; -(M - 1)÷2:-1] .* 2π / L
     v = (1:N) .* 2 .* H ./ N .- H .- H ./ N
 
-    expv = exp.(- 1im .* k .* v' .* t)
+    expv = exp.(-1im .* k .* v' .* t)
 
     @inbounds for i = 2:M
-        E1[i] += 1 / (1im * k[i]) * sum(ff0[i,:] .* (expv[i,:] .- 1.0)) * 2H / N
+        E1[i] += 1 / (1im * k[i]) * sum(ff0[i, :] .* (expv[i, :] .- 1.0)) * 2H / N
     end
 
     ff0 .*= expv
@@ -49,8 +49,11 @@ struct H1fOperator
     tmp::Matrix{ComplexF64}
     expv::Matrix{ComplexF64}
 
-    H1fOperator(adv) = new(adv, zeros(ComplexF64, adv.mesh.nx, adv.mesh.nv)
-                              , zeros(ComplexF64, adv.mesh.nx, adv.mesh.nv))
+    H1fOperator(adv) = new(
+        adv,
+        zeros(ComplexF64, adv.mesh.nx, adv.mesh.nv),
+        zeros(ComplexF64, adv.mesh.nx, adv.mesh.nv),
+    )
 
 end
 
@@ -68,40 +71,41 @@ $(SIGNATURES)
 """
 function step!(f0, f1, f2, f3, E1, op::H1fOperator, dt)
 
-    dv :: Float64 = op.adv.mesh.dv
-    nx :: Int = op.adv.mesh.nx
-    nv :: Int = op.adv.mesh.nv
-    kx :: Vector{Float64} = op.adv.mesh.kx
-    v :: Vector{Float64} = op.adv.mesh.vnode
-    op.expv .= exp.(- 1im .* kx .* v' .* dt)
+    dv::Float64 = op.adv.mesh.dv
+    nx::Int = op.adv.mesh.nx
+    nv::Int = op.adv.mesh.nv
+    kx::Vector{Float64} = op.adv.mesh.kx
+    v::Vector{Float64} = op.adv.mesh.vnode
+    op.expv .= exp.(-1im .* kx .* v' .* dt)
 
     transpose!(op.tmp, f0)
     fft!(op.tmp, 1)
 
     @inbounds for i = 2:nx
-        E1[i] += 1 / (1im * kx[i]) * sum(view(op.tmp,i,:) .* (view(op.expv,i,:) .- 1.0)) * dv
+        E1[i] +=
+            1 / (1im * kx[i]) * sum(view(op.tmp, i, :) .* (view(op.expv, i, :) .- 1.0)) * dv
     end
 
     op.tmp .*= op.expv
     ifft!(op.tmp, 1)
-    transpose!( f0, real(op.tmp))
+    transpose!(f0, real(op.tmp))
 
     transpose!(op.tmp, f1)
     fft!(op.tmp, 1)
     op.tmp .*= op.expv
     ifft!(op.tmp, 1)
-    transpose!( f1, real(op.tmp))
+    transpose!(f1, real(op.tmp))
 
     transpose!(op.tmp, f2)
     fft!(op.tmp, 1)
     op.tmp .*= op.expv
     ifft!(op.tmp, 1)
-    transpose!( f2, real(op.tmp))
+    transpose!(f2, real(op.tmp))
 
     transpose!(op.tmp, f3)
     fft!(op.tmp, 1)
     op.tmp .*= op.expv
     ifft!(op.tmp, 1)
-    transpose!( f3, real(op.tmp))
+    transpose!(f3, real(op.tmp))
 
 end

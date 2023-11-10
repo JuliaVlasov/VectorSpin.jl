@@ -38,76 +38,77 @@ $(TYPEDFIELDS)
 
 """
 struct BSplineAdvection <: AbstractAdvection
-    
-    mesh     :: Mesh
-    dims     :: Symbol
-    p        :: Int64 
-    step     :: Float64
-    modes    :: Vector{Float64}
-    eig_bspl :: Vector{Float64}
-    eigalpha :: Vector{Complex{Float64}}
-    fhat     :: Matrix{ComplexF64}
-    
-    function BSplineAdvection( mesh :: Mesh; p = 3, dims = :v )
+
+    mesh::Mesh
+    dims::Symbol
+    p::Int64
+    step::Float64
+    modes::Vector{Float64}
+    eig_bspl::Vector{Float64}
+    eigalpha::Vector{Complex{Float64}}
+    fhat::Matrix{ComplexF64}
+
+    function BSplineAdvection(mesh::Mesh; p = 3, dims = :v)
 
         if dims == :v
-            n        = mesh.nv
-            step     = mesh.dv
+            n = mesh.nv
+            step = mesh.dv
             fhat = zeros(ComplexF64, mesh.nv, mesh.nx)
-        else 
-            n        = mesh.nx
-            step     = mesh.dx
+        else
+            n = mesh.nx
+            step = mesh.dx
             fhat = zeros(ComplexF64, mesh.nx, mesh.nv)
         end
 
-        modes     = zeros(Float64, n)
-        modes    .= [2π * i / n for i in 0:n-1]
-        eig_bspl  = zeros(Float64, n)
-        eig_bspl .= bspline(p, -div(p+1,2), 0.0)
-        for i in 1:div(p+1,2)-1
-            eig_bspl .+= bspline(p, i-(p+1)÷2, 0.0) * 2 .* cos.(i * modes)
+        modes = zeros(Float64, n)
+        modes .= [2π * i / n for i = 0:n-1]
+        eig_bspl = zeros(Float64, n)
+        eig_bspl .= bspline(p, -div(p + 1, 2), 0.0)
+        for i = 1:div(p + 1, 2)-1
+            eig_bspl .+= bspline(p, i - (p + 1) ÷ 2, 0.0) * 2 .* cos.(i * modes)
         end
-        eigalpha  = zeros(Complex{Float64}, n)
-        new( mesh, dims, p, step, modes, eig_bspl, eigalpha, fhat )
+        eigalpha = zeros(Complex{Float64}, n)
+        new(mesh, dims, p, step, modes, eig_bspl, eigalpha, fhat)
     end
-    
+
 end
 
 export advection!
 
-function advection!( f, adv :: BSplineAdvection, v, dt)
-    
-   if adv.dims == :x
-       transpose!(adv.fhat, f)
-   else
-       adv.fhat .= f
-   end
+function advection!(f, adv::BSplineAdvection, v, dt)
 
-   fft!(adv.fhat,1)
-    
-   @inbounds for j in eachindex(v)
-      alpha = dt * v[j] / adv.step
-      # compute eigenvalues of cubic splines evaluated at displaced points
-      ishift = floor(-alpha)
-      beta   = -ishift - alpha
-      fill!(adv.eigalpha,0.0im)
-      for i in -div(adv.p-1,2):div(adv.p+1,2)
-         adv.eigalpha .+= (bspline(adv.p, i-div(adv.p+1,2), beta) 
-                        .* exp.((ishift+i) * 1im .* adv.modes))
-      end
-          
-      # compute interpolating spline using fft and properties of circulant matrices
-      
-      adv.fhat[:,j] .*= adv.eigalpha ./ adv.eig_bspl
-        
-   end
-        
-   ifft!(adv.fhat,1)
-   if adv.dims == :x
-       transpose!(f, real(adv.fhat))
-   else 
-       f .= real(adv.fhat)
-   end
-    
-end            
+    if adv.dims == :x
+        transpose!(adv.fhat, f)
+    else
+        adv.fhat .= f
+    end
 
+    fft!(adv.fhat, 1)
+
+    @inbounds for j in eachindex(v)
+        alpha = dt * v[j] / adv.step
+        # compute eigenvalues of cubic splines evaluated at displaced points
+        ishift = floor(-alpha)
+        beta = -ishift - alpha
+        fill!(adv.eigalpha, 0.0im)
+        for i = -div(adv.p - 1, 2):div(adv.p + 1, 2)
+            adv.eigalpha .+= (
+                bspline(adv.p, i - div(adv.p + 1, 2), beta) .*
+                exp.((ishift + i) * 1im .* adv.modes)
+            )
+        end
+
+        # compute interpolating spline using fft and properties of circulant matrices
+
+        adv.fhat[:, j] .*= adv.eigalpha ./ adv.eig_bspl
+
+    end
+
+    ifft!(adv.fhat, 1)
+    if adv.dims == :x
+        transpose!(f, real(adv.fhat))
+    else
+        f .= real(adv.fhat)
+    end
+
+end

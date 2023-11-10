@@ -5,7 +5,7 @@ $(SIGNATURES)
 
 interpolate df(x - delta)
 """
-function translation!(df, delta :: Vector{Float64}, H)
+function translation!(df, delta::Vector{Float64}, H)
 
     # first recover oldvector & get the coefficients of piecewise polynomials
 
@@ -25,7 +25,7 @@ function translation!(df, delta :: Vector{Float64}, H)
 
     @inbounds for j = 1:M
 
-        for i in 2:N
+        for i = 2:N
             c[i] = df[i-1, j] + df[i, j]
         end
         c[1] = df[1, j]
@@ -40,16 +40,16 @@ function translation!(df, delta :: Vector{Float64}, H)
             b[i] = (-1)^i * 2 * sum(view(cc, 2:i))
         end
         b[1] = 0
-        for i in 1:N-1
+        for i = 1:N-1
             a[i] = 0.5 * (b[i+1] - b[i])
         end
-        a[N] = - 0.5 * b[N]
+        a[N] = -0.5 * b[N]
 
         alpha = delta[j] / (2H / N)
 
         for i = 1:N
 
-            beta :: Float64 = i + alpha
+            beta::Float64 = i + alpha
             newbeta = beta - N * floor(Int, beta / N)
 
             if newbeta >= 1.0
@@ -60,7 +60,7 @@ function translation!(df, delta :: Vector{Float64}, H)
                 k = 1 - newbeta
             end
 
-            l1 = mod1(l+1,N)
+            l1 = mod1(l + 1, N)
             k1 = 1 - k
             k2 = (1 - k)^2
             k3 = (1 - k)^3
@@ -77,4 +77,3 @@ function translation!(df, delta :: Vector{Float64}, H)
     end
 
 end
-

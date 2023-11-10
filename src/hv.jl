@@ -20,7 +20,7 @@ function Hv!(f0, f1, f2, f3, t, M, N, L, H)
     v = collect(1:N) .* 2H ./ N .- H .- H ./ N
 
     # translate in the direction of x for f0, f1, f2 and f3
-    
+
     fft!(ff0, 1)
     fft!(ff1, 1)
     fft!(ff2, 1)
@@ -30,7 +30,7 @@ function Hv!(f0, f1, f2, f3, t, M, N, L, H)
 
     for i in eachindex(v), j in eachindex(k_fre)
 
-        expv = exp(- 1im * k_fre[j] * v[i] * t)
+        expv = exp(-1im * k_fre[j] * v[i] * t)
 
         ff0[j, i] *= expv
         ff1[j, i] *= expv
@@ -39,11 +39,11 @@ function Hv!(f0, f1, f2, f3, t, M, N, L, H)
 
     end
 
-    E1t = vec(sum(ff0, dims=2))
+    E1t = vec(sum(ff0, dims = 2))
     E1t[1] = 0.0
 
     for i = 2:M
-        E1t[i] *= (2H / N) / (- 1im * k_fre[i])
+        E1t[i] *= (2H / N) / (-1im * k_fre[i])
     end
 
     ifft!(ff0, 1)

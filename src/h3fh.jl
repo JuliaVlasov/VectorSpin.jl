@@ -74,9 +74,9 @@ $(SIGNATURES)
 """
 function step!(f0, f1, f2, f3, E2, A2, op, dt, h_int)
 
-    nx :: Int = op.adv.mesh.nx
-    dv :: Float64 = op.adv.mesh.dv
-    k :: Vector{Float64} = op.adv.mesh.kx
+    nx::Int = op.adv.mesh.nx
+    dv::Float64 = op.adv.mesh.dv
+    k::Vector{Float64} = op.adv.mesh.kx
 
     op.partial .= -k .^ 2 .* A2
     ifft!(op.partial)
@@ -127,15 +127,15 @@ function H3fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
 
     B30 = -K_xc * n_i * 0.5 * S3
     fS3 = fft(S3)
-    partialB3 = (-((K_xc * n_i * 0.5 * 1im * k )) .* fS3)
+    partialB3 = (-((K_xc * n_i * 0.5 * 1im * k)) .* fS3)
     ifft!(partialB3)
-    partial2S3 = -(k.^ 2) .* fS3
+    partial2S3 = -(k .^ 2) .* fS3
     ifft!(partial2S3)
 
     S1t = zeros(M)
     S2t = zeros(M)
     for i = 1:M
-        temi = K_xc / 4 * sum(view(f3,:, i)) * 2H / N + 0.01475 * real(partial2S3[i])
+        temi = K_xc / 4 * sum(view(f3, :, i)) * 2H / N + 0.01475 * real(partial2S3[i])
         S1t[i] = cos(t * temi) * S1[i] + sin(t * temi) * S2[i]
         S2t[i] = -sin(t * temi) * S1[i] + cos(t * temi) * S2[i]
     end
@@ -143,7 +143,7 @@ function H3fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
     v1 = zeros(M)
     v2 = zeros(M)
     for i = 1:M
-        v1[i] = (t * real(partialB3[i]) * mub) 
+        v1[i] = (t * real(partialB3[i]) * mub)
         v2[i] = -v1[i]
     end
 
@@ -156,7 +156,7 @@ function H3fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
     f0 .= u1 .+ u2
     f3 .= u1 .- u2
 
-    for j in 1:N, i = 1:M
+    for j = 1:N, i = 1:M
         u1[j, i] = cos(t * B30[i]) * f1[j, i] - sin(t * B30[i]) .* f2[j, i]
         u2[j, i] = sin(t * B30[i]) * f1[j, i] + cos(t * B30[i]) .* f2[j, i]
     end

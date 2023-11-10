@@ -1,3 +1,4 @@
+#=
 export diagnostics, Diagnostics, save!
 
 function diagnostics(f0, f2, f3, E1, E2, E3, A2, A3, M, N, L, H, h_int)
@@ -113,6 +114,7 @@ function save!(results, time, f0, f2, f3, E1, E2, E3, A2, A3)
 
 end
 
+
 function diagnostics(f0, f2, f3, E1, E2, E3, A2, A3, mesh::Mesh, h_int)
 
     nv, nx = mesh.nv, mesh.nx
@@ -170,11 +172,11 @@ end
 
 ex_energy( E1, L, M )  = 0.5 * sum(real(ifft(E1)).^2) * L/M
 
-function bf_energy( f1,, f2, f3, S1, S1, S3, M, N, L, H, tiK, n_i)
+function bf_energy( f1, f2, f3, S1, S2, S3, M, N, L, H, tiK, n_i)
 
-   bb1 = -K_xc*n_i*0.5*S1
-   bb2 = -K_xc*n_i*0.5*S2
-   bb3 = -K_xc*n_i*0.5*S3
+   bb1 = - K_xc * n_i * 0.5 * S1
+   bb2 = - K_xc * n_i * 0.5 * S2
+   bb3 = - K_xc * n_i * 0.5 * S3
 
    ebf1 = 0.0
    ebf2 = 0.0
@@ -209,27 +211,14 @@ function s_energy(S1, S2, S3, M, N, L, H, mub=0.3386, n_i = 1.0)
     ifft!(S2t)
     ifft!(S3t)
 
-    es1 = sum(aj0 * n_i * (real(S1t).^2) * L / M)
-    es2 = sum(aj0 * n_i * (real(S2t).^2) * L / M)
-    es3 = sum(aj0 * n_i * (real(S3t).^2) * L / M)
+    es1 = sum(aj0 .* n_i .* real(S1t).^2 * L / M)
+    es2 = sum(aj0 .* n_i .* real(S2t).^2 * L / M)
+    es3 = sum(aj0 .* n_i .* real(S3t).^2 * L / M)
 
     return es1, es2, es3
 
 end
-#=
 
-function energy( f0, f1, f2, f3, S1, S2, S3)
-energy=Ex_energy+energykinetic+energyBf1+energyBf2+energyBf3+S1energy+S2energy+S3energy;
-
-snorm 
-
-value1=1:(M-1)/2+1;
-value2=(M-1)/2+2:M;
-mub=0.3386;
-h_int=2.0*mub;
-aj0=0.01475*h_int/2.0;
-K_xc=tiK;
-
-Snorm=max(abs((S1.^2+S2.^2+S3.^2)-1));
+snorm(S1, S2, S3) = maximum(abs.((S1.^2 .+ S2.^2 .+ S3.^2) .- 1))
 
 =#

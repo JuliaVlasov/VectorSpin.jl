@@ -11,21 +11,21 @@ function H2fh!(f0, f1, f2, f3, E3, A3, t, L, H, h_int)
     k = fftfreq(M, M) .* 2π ./ L
 
     partialA3 = real(ifft(1im .* k .* A3))
-    partial2A3 = real(ifft( - k.^ 2 .* A3))
-    
+    partial2A3 = real(ifft(-k .^ 2 .* A3))
+
     v1 = t .* h_int .* partial2A3 ./ sqrt(3)
-    v2 = - v1
+    v2 = -v1
 
     u1 = 0.5 .* f0 .+ 0.5 * sqrt(3) .* f2
     u2 = 0.5 .* f0 .- 0.5 * sqrt(3) .* f2
 
-    translation!( u1, v1, H)
-    translation!( u2, v2, H)
+    translation!(u1, v1, H)
+    translation!(u2, v2, H)
 
     ff2 = complex(f2)
-    fft!( ff2, 2)
+    fft!(ff2, 2)
     @inbounds for i = 2:M
-        E3[i] += - t * h_int * 1im * k[i] * sum(ff2[:, i]) * 2 * H / N
+        E3[i] += -t * h_int * 1im * k[i] * sum(ff2[:, i]) * 2 * H / N
     end
 
     f0 .= u1 .+ u2
@@ -76,13 +76,13 @@ $(SIGNATURES)
 """
 function step!(f0, f1, f2, f3, E3, A3, op::H2fhOperator, dt, h_int)
 
-    kx :: Vector{Float64} = op.adv.mesh.kx
-    dv :: Float64 = op.adv.mesh.dv
+    kx::Vector{Float64} = op.adv.mesh.kx
+    dv::Float64 = op.adv.mesh.dv
 
     op.partial .= -kx .^ 2 .* A3
     ifft!(op.partial)
 
-    op.v1 .= - h_int .* real(op.partial) ./ sqrt(3)
+    op.v1 .= -h_int .* real(op.partial) ./ sqrt(3)
     op.v2 .= -op.v1
 
     op.u1 .= 0.5 * f0 .+ 0.5 * sqrt(3) .* f2
@@ -130,14 +130,14 @@ function H2fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
     B20 = -K_xc * n_i * 0.5 * S2
     k = fftfreq(M, M)
 
-    f1 .=  cos.(t * B20') .* f1 .+ sin.(t * B20') .* f3
+    f1 .= cos.(t * B20') .* f1 .+ sin.(t * B20') .* f3
     f3 .= -sin.(t * B20') .* f1 .+ cos.(t * B20') .* f3
 
     fS2 = fft(S2)
 
-    partialB2 .= (-((K_xc * n_i * 0.5 * 2pi * 1im / L .* k )) .* fS2)
+    partialB2 .= (-((K_xc * n_i * 0.5 * 2pi * 1im / L .* k)) .* fS2)
     ifft!(partialB2)
-    partial2S2 = (-((2pi / L * k ) .^ 2) .* fS2)
+    partial2S2 = (-((2pi / L * k) .^ 2) .* fS2)
     ifft!(partial2S2)
 
     v1 = zeros(M)

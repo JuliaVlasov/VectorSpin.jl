@@ -21,7 +21,7 @@ function H1fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
     partialB1 = -((K_xc * n_i * 0.5 * 2pi * 1im / L .* k)) .* fS1
     ifft!(partialB1)
 
-    partial2S1 = (-((2pi / L .* k )) .^ 2) .* fS1
+    partial2S1 = (-((2pi / L .* k)) .^ 2) .* fS1
     ifft!(partial2S1)
 
     v1 = zeros(M)
@@ -32,8 +32,8 @@ function H1fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
     end
 
 
-    u1 =  0.5 .* f0 .+ 0.5 .* f1
-    u2 =  0.5 .* f0 .- 0.5 .* f1
+    u1 = 0.5 .* f0 .+ 0.5 .* f1
+    u2 = 0.5 .* f0 .- 0.5 .* f1
 
     translation!(u1, v1, H)
     translation!(u2, v2, H)
@@ -46,7 +46,7 @@ function H1fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
     S3t = similar(S2)
     for i = 1:M
 
-        temi = K_xc / 4 * sum(view(f1,:, i)) * 2H / N + 0.01475 * real(partial2S1[i])
+        temi = K_xc / 4 * sum(view(f1, :, i)) * 2H / N + 0.01475 * real(partial2S1[i])
 
         S2t[i] = cos(t * temi) * S2[i] + sin(t * temi) * S3[i]
         S3t[i] = -sin(t * temi) * S2[i] + cos(t * temi) * S3[i]
