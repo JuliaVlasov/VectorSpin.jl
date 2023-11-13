@@ -16,12 +16,12 @@ function init(k, x, i, v1int, frequency, a, femi, tiK)
     end
 
     f =
-        (1 / sqrt(pi) / kk) *
+        (1.0 / sqrt(pi) / kk) *
         exp(-(v1int[i])^2 / kk / kk) *
-        (1 + a * cos(frequency * x[k])) *
+        (1.0 + a * cos(frequency * x[k])) *
         femi
     df =
-        (1 / sqrt(pi) / kk) *
+        (1.0 / sqrt(pi) / kk) *
         exp(-(v1int[i])^2 / kk / kk) *
         (a * cos(frequency * x[k])) *
         femi
