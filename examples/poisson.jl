@@ -34,39 +34,21 @@ v = (1:N) * 2 * H / N .- H # mesh in v
 E_exact = - a ./ k .* sin.(k * x)
 E1 = fft(E_exact)
 plot(x, E_exact)
+# -
 
+for j = 1:M, i = 1:N
+    f0[i, j] = (1.0 / sqrt(pi)) * exp(-v[i]^2) * (1.0 + a * cos(k * x[j]))
+end
 # +
-vnode = zeros(5N)
-for i = 1:N
-    vnode[5i-4] = v[i] - 2H / N
-    vnode[5i-3] = v[i] - (2H / N) * 0.75
-    vnode[5i-2] = v[i] - (2H / N) * 0.50
-    vnode[5i-1] = v[i] - (2H / N) * 0.25
-    vnode[5i] = v[i]
-end
-
-f0_node = zeros(5N, M)
-
-for k = 1:M, i = 1:5N
-    f0_node[i, k] = (1.0 / sqrt(pi)) * exp(-(vnode[i]))^2 * (1.0 + a * cos(k * x[k]))
-end
-
-f0 = zeros(N, M)
-for k = 1:M
-    f0[:, k] .= integrate(f0_node[:, k], N)
-end
-
-f0 = zeros(N, M)
 f1 = zeros(N, M)
 f2 = zeros(N, M)
 f3 = zeros(N, M)
-for k = 1:M
-    f0[:, k] .= integrate(f0_value_at_node[:, k], N)
-end
 
 t = 0.0
 E1 = Hv!(f0, f1, f2, f3, t, M, N, L, H)
-plot(x, real(ifft(E1)))
+plot(x, real(ifft(E1)) .- E_exact)
 # -
+
+
 
 
