@@ -82,7 +82,7 @@ using MAT
     end
     
     # Lie splitting
-    E1 .= Hv!(f0, f1, f2, f3, h, M, N, L, H)
+    Hv!(f0, f1, f2, f3, E1, h, M, N, L, H)
     
     hv = matread("hv.mat")
     
@@ -92,7 +92,7 @@ using MAT
     @test f2 ≈ hv["f2"]
     @test f3 ≈ hv["f3"]
     
-    VectorSpin.He!(f0, f1, f2, f3, E1, h, H)
+    He!(f0, f1, f2, f3, E1, h, H)
     
     he = matread("he.mat")
     
@@ -101,7 +101,7 @@ using MAT
     @test f2 ≈ he["f2"]
     @test f3 ≈ he["f3"]
     
-    S2, S3 = H1fh!(f0, f1, f2, f3, S1, S2, S3, h, M, N, L, H, tildeK)
+    H1fh!(f0, f1, f2, f3, S1, S2, S3, h, M, N, L, H, tildeK)
     
     h1fh = matread("h1fh.mat")
     
@@ -112,7 +112,7 @@ using MAT
     @test S2 ≈ vec(h1fh["S2"])
     @test S3 ≈ vec(h1fh["S3"])
     
-    S1, S3 = H2fh!(f0, f1, f2, f3, S1, S2, S3, h, M, N, L, H, tildeK)
+    H2fh!(f0, f1, f2, f3, S1, S2, S3, h, M, N, L, H, tildeK)
     
     h2fh = matread("h2fh.mat")
     
@@ -123,8 +123,8 @@ using MAT
     @test S1 ≈ vec(h2fh["S1"])
     @test S3 ≈ vec(h2fh["S3"])
     
-    S1, S2 = H3fh!(f0, f1, f2, f3, S1, S2, S3, h, M, N, L, H, tildeK)
-    
+    H3fh!(f0, f1, f2, f3, S1, S2, S3, h, M, N, L, H, tildeK)
+   
     h3fh = matread("h3fh.mat")
     
     @test f0 ≈ h3fh["f0"]
