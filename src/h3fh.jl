@@ -156,7 +156,7 @@ function H3fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
     f0 .= u1 .+ u2
     f3 .= u1 .- u2
 
-    for j = 1:N, i = 1:M
+    for i = 1:M, j = 1:N
         u1[j, i] = cos(t * B30[i]) * f1[j, i] - sin(t * B30[i]) .* f2[j, i]
         u2[j, i] = sin(t * B30[i]) * f1[j, i] + cos(t * B30[i]) .* f2[j, i]
     end
@@ -164,5 +164,7 @@ function H3fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
     f1 .= u1
     f2 .= u2
 
-    return S1t, S2t
+    S1 .= S1t
+    S2 .= S2t
+
 end

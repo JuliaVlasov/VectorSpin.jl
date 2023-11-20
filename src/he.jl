@@ -56,6 +56,7 @@ function step!(f0, f1, f2, f3, E1, E2, E3, A2, A3, op::HeOperator, dt)
 
 end
 
+export He!
 
 """
 $(SIGNATURES)

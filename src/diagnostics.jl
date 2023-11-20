@@ -150,20 +150,26 @@ function diagnostics(f0, f2, f3, E1, E2, E3, A2, A3, mesh::Mesh, h_int)
     return Ex_energy, E_energy, B_energy, energy, Sz, Tt
 end
 
+export kinetic_energy
 
 function kinetic_energy(f0, M, N, L, H)
-    v = (1:N) .* 2H / N .- H - H / N
+    v = collect(1:N) .* 2H ./ N .- H .- H ./ N
     e = 0.0
-    for j = 1:M, k = 1:N
-        e += 1 / 2 * (f0[k, j] * ((v[k]^2))) * L / M * 2H / N
+    for j = 1:M, i = 1:N
+        e += 1 / 2 * (f0[i, j] * ((v[i]^2))) * L / M * 2H / N
     end
     e
 end
 
+export ex_energy
+
 ex_energy(E1, L, M) = 0.5 * sum(real(ifft(E1)) .^ 2) * L / M
 
-function bf_energy(f1, f2, f3, S1, S2, S3, M, N, L, H, tiK, n_i)
+export bf_energy
 
+function bf_energy(f1, f2, f3, S1, S2, S3, M, N, L, H, tiK, n_i = 1.0, mub = 0.3386)
+
+    K_xc = tiK
     bb1 = -K_xc * n_i * 0.5 * S1
     bb2 = -K_xc * n_i * 0.5 * S2
     bb3 = -K_xc * n_i * 0.5 * S3
@@ -182,6 +188,8 @@ function bf_energy(f1, f2, f3, S1, S2, S3, M, N, L, H, tiK, n_i)
 
 end
 
+export s_energy
+
 function s_energy(S1, S2, S3, M, N, L, H, mub = 0.3386, n_i = 1.0)
 
     h_int = 2.0 * mub
@@ -189,13 +197,9 @@ function s_energy(S1, S2, S3, M, N, L, H, mub = 0.3386, n_i = 1.0)
 
     k = fftfreq(M, M) .* 2π ./ L
 
-    S1t = fft(S1)
-    S2t = fft(S2)
-    S3t = fft(S3)
-
-    S1t .*= (1im * k)
-    S2t .*= (1im * k)
-    S3t .*= (1im * k)
+    S1t = fft(S1) .* 1im .* k
+    S2t = fft(S2) .* 1im .* k
+    S3t = fft(S3) .* 1im .* k
 
     ifft!(S1t)
     ifft!(S2t)
@@ -209,4 +213,20 @@ function s_energy(S1, S2, S3, M, N, L, H, mub = 0.3386, n_i = 1.0)
 
 end
 
+export snorm
+
 snorm(S1, S2, S3) = maximum(abs.((S1 .^ 2 .+ S2 .^ 2 .+ S3 .^ 2) .- 1))
+
+export energy
+
+function energy(f0, f1, f2, f3, S1, S2, S3, E1, M, N, L, H, tiK, n_i)
+
+   res = sum(s_energy(S1, S2, S3, M, N, L, H))
+   res += ex_energy(E1, L, M) 
+   res += sum(bf_energy(f1, f2, f3, S1, S2, S3, M, N, L, H, tiK, n_i))
+   res += kinetic_energy(f0, M, N, L, H)
+
+   return res
+
+end
+   

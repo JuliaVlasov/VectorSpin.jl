@@ -10,7 +10,7 @@ f_t+vf_x=0
 -E_x=\rho-1
 
 """
-function Hv!(f0, f1, f2, f3, t, M, N, L, H)
+function Hv!(f0, f1, f2, f3, E1, t, M, N, L, H)
 
     ff0 = complex(f0')
     ff1 = complex(f1')
@@ -56,6 +56,6 @@ function Hv!(f0, f1, f2, f3, t, M, N, L, H)
     f2 .= real(ff2')
     f3 .= real(ff3')
 
-    return E1t
+    E1 .= E1t
 
 end

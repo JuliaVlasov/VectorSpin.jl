@@ -18,7 +18,7 @@ function H1fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
     B10 = -K_xc * n_i * 0.5 * S1
     fS1 = fft(S1)
 
-    partialB1 = -((K_xc * n_i * 0.5 * 2pi * 1im / L .* k)) .* fS1
+    partialB1 = -((K_xc * n_i * 0.5 * 2π * 1im / L .* k)) .* fS1
     ifft!(partialB1)
 
     partial2S1 = (-((2pi / L .* k)) .^ 2) .* fS1
@@ -56,6 +56,7 @@ function H1fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
     f0 .= u1 .+ u2
     f1 .= u1 .- u2
 
-    return S2t, S3t
+    S2 .= S2t
+    S3 .= S3t
 
 end

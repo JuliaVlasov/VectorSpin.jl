@@ -36,6 +36,7 @@ E1 = fft(E_exact)
 plot(x, E_exact)
 # -
 
+f0 = zeros(N, M)
 for j = 1:M, i = 1:N
     f0[i, j] = (1.0 / sqrt(pi)) * exp(-v[i]^2) * (1.0 + a * cos(k * x[j]))
 end

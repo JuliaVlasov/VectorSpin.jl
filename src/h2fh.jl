@@ -165,6 +165,7 @@ function H2fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
     f0 .= u1 .+ u2
     f2 .= u1 .- u2
 
-    return S1t, S3t
+    S1 .= S1t
+    S3 .= S3t
 
 end
