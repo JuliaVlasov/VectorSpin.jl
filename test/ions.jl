@@ -52,21 +52,21 @@ using MAT
         v1node[5i] = v1[i]
     end
     
-    f0_value_at_node = zeros(5N, M)
-    df0_value_at_node = zeros(5N, M)
-    f1_value_at_node = zeros(5N, M)
-    f2_value_at_node = zeros(5N, M)
-    f3_value_at_node = zeros(5N, M)
-    df3_value_at_node = zeros(5N, M)
+    f0_node = zeros(5N, M)
+    df0_node = zeros(5N, M)
+    f1_node = zeros(5N, M)
+    f2_node = zeros(5N, M)
+    f3_node = zeros(5N, M)
+    df3_node = zeros(5N, M)
     femi1 = 1
     femi2 = -1
     
     for k = 1:M, i = 1:5N
-        f0_value_at_node[i, k], df0_value_at_node[i, k] =
+        f0_node[i, k], df0_node[i, k] =
             init(k, x, i, v1node, kkk, a, femi1, tildeK)
-        f1_value_at_node[i, k] = 0.0
-        f2_value_at_node[i, k] = 0.0
-        f3_value_at_node[i, k], df3_value_at_node[i, k] =
+        f1_node[i, k] = 0.0
+        f2_node[i, k] = 0.0
+        f3_node[i, k], df3_node[i, k] =
             init(k, x, i, v1node, kkk, a, femi2, tildeK)
     end
     
@@ -75,10 +75,10 @@ using MAT
     f2 = zeros(N, M)
     f3 = zeros(N, M)
     for k = 1:M
-        f0[:, k] .= integrate(f0_value_at_node[:, k], N)
-        f1[:, k] .= integrate(f1_value_at_node[:, k], N)
-        f2[:, k] .= integrate(f2_value_at_node[:, k], N)
-        f3[:, k] .= integrate(f3_value_at_node[:, k], N)
+        f0[:, k] .= integrate(f0_node[:, k], N)
+        f1[:, k] .= integrate(f1_node[:, k], N)
+        f2[:, k] .= integrate(f2_node[:, k], N)
+        f3[:, k] .= integrate(f3_node[:, k], N)
     end
     
     # Lie splitting
