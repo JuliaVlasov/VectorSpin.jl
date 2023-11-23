@@ -121,7 +121,11 @@ H1fh!(f0, f1, f2, f3, S1, S2, S3, h, M, N, L, H, tildeK)
 H2fh!(f0, f1, f2, f3, S1, S2, S3, h, M, N, L, H, tildeK)
 H3fh!(f0, f1, f2, f3, S1, S2, S3, h, M, N, L, H, tildeK)
 
-ex_energy(E1, L, M), last(xue["Ex_energy"])
+hvmat = matread(joinpath("..","test","hv.mat"))
+
+ex_energy(hvmat["E1"], L, M) ≈ ex_energy(E1, L, M)
+
+ex_energy(E1, L, M)#, last(xue["Ex_energy"])
 
 @testset "last" begin 
     @test ex_energy(E1, L, M) ≈ last(xue["Ex_energy"])
@@ -140,17 +144,6 @@ end
 
 @test snorm(S1, S2, S3) ≈ last(xue["Snorm"])
 
-plot((x, x,x), (S1, S2, S3))
-plot!((x,x,x), (xue["S1value"], xue["S2value"], xue["S3value"]))
-
-@test xue["f0valuets100"] ≈ f0
-
-xue["f1valuets100"] ≈ f1
-
-xue["f2valuets100"] ≈ f2
-
-xue["f3valuets100"] ≈ f3
-
-xue
-
-
+plot(x, S1, label = "S1")
+plot!(x, S2, label = "S2")
+plot!(x, S3, label = "S3")

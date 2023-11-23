@@ -152,11 +152,11 @@ end
 
 export kinetic_energy
 
-function kinetic_energy(f0, M, N, L, H)
+function kinetic_energy(f0, M::Int, N::Int, L, H)
     v = collect(1:N) .* 2H ./ N .- H .- H ./ N
     e = 0.0
     for j = 1:M, i = 1:N
-        e += 1 / 2 * (f0[i, j] * ((v[i]^2))) * L / M * 2H / N
+        e += 0.5 * f0[i, j] * v[i]^2 * L / M * 2H / N
     end
     e
 end
