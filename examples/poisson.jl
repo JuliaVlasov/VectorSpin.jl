@@ -31,7 +31,7 @@ a = 0.001
 x = (0:(M-1)) .* L / M # mesh in x
 v = (1:N) * 2 * H / N .- H # mesh in v
 
-E_exact = - a ./ k .* sin.(k * x)
+E_exact = -a ./ k .* sin.(k * x)
 E1 = fft(E_exact)
 plot(x, E_exact)
 # -
@@ -49,7 +49,3 @@ t = 0.0
 E1 = Hv!(f0, f1, f2, f3, t, M, N, L, H)
 plot(x, real(ifft(E1)) .- E_exact)
 # -
-
-
-
-

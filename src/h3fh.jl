@@ -5,7 +5,6 @@ function H3fh!(f0, f1, f2, f3, E2, A2, t, L, H, h_int)
 
     N, M = size(f0)
 
-    #####################################################
     # use FFT to compute A2_x; A2_xx
     k = 2π ./ L .* fftfreq(M, M)
     partialA2 = 1im .* k .* A2

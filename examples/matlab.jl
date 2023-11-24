@@ -17,8 +17,5 @@ plot(vec(vars["time"]), vec(vars["energy"]))
 
 @gif for Tvalue in eachcol(vars["Tvalue"])
     plot(Tvalue)
-    ylims!(0,0.1)
+    ylims!(0, 0.1)
 end
-    
-
-

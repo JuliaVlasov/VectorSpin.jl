@@ -1,5 +1,7 @@
 using LinearAlgebra
 
+export translation!
+
 """
 $(SIGNATURES)
 

@@ -98,22 +98,23 @@ for j = 1:M
 end
 # -
 
-@testset "first" begin 
+@testset "first" begin
     @test ex_energy(E1, L, M) ≈ first(xue["Ex_energy"])
     @test kinetic_energy(f0, M, N, L, H) ≈ first(xue["energykinetic"])
-    @test energy(f0, f1, f2, f3, S1, S2, S3, E1, M, N, L, H, tildeK, n_i) ≈ first(xue["energy"])
+    @test energy(f0, f1, f2, f3, S1, S2, S3, E1, M, N, L, H, tildeK, n_i) ≈
+          first(xue["energy"])
     bf1, bf2, bf3 = bf_energy(f1, f2, f3, S1, S2, S3, M, N, L, H, tildeK)
     @test bf1 ≈ first(xue["energyBf1"])
     @test bf2 ≈ first(xue["energyBf2"])
     @test bf3 ≈ first(xue["energyBf3"])
     S1_nrj, S2_nrj, S3_nrj = s_energy(S1, S2, S3, M, N, L, H)
-    @test S1_nrj ≈ first(xue["S1energy"]) atol=1e-15
-    @test S2_nrj ≈ first(xue["S2energy"]) atol=1e-15
-    @test S3_nrj ≈ first(xue["S3energy"]) atol=1e-15
+    @test S1_nrj ≈ first(xue["S1energy"]) atol = 1e-15
+    @test S2_nrj ≈ first(xue["S2energy"]) atol = 1e-15
+    @test S3_nrj ≈ first(xue["S3energy"]) atol = 1e-15
     @test snorm(S1, S2, S3) ≈ first(xue["Snorm"])
 end
 
-ex_energy(E1, L, M) 
+ex_energy(E1, L, M)
 
 Hv!(f0, f1, f2, f3, E1, h, M, N, L, H)
 He!(f0, f1, f2, f3, E1, h, H)
@@ -121,24 +122,25 @@ H1fh!(f0, f1, f2, f3, S1, S2, S3, h, M, N, L, H, tildeK)
 H2fh!(f0, f1, f2, f3, S1, S2, S3, h, M, N, L, H, tildeK)
 H3fh!(f0, f1, f2, f3, S1, S2, S3, h, M, N, L, H, tildeK)
 
-hvmat = matread(joinpath("..","test","hv.mat"))
+hvmat = matread(joinpath("..", "test", "hv.mat"))
 
 ex_energy(hvmat["E1"], L, M) ≈ ex_energy(E1, L, M)
 
 ex_energy(E1, L, M)#, last(xue["Ex_energy"])
 
-@testset "last" begin 
+@testset "last" begin
     @test ex_energy(E1, L, M) ≈ last(xue["Ex_energy"])
     @test kinetic_energy(f0, M, N, L, H) ≈ last(xue["energykinetic"])
-    @test energy(f0, f1, f2, f3, S1, S2, S3, E1, M, N, L, H, tildeK, n_i) ≈ last(xue["energy"])
+    @test energy(f0, f1, f2, f3, S1, S2, S3, E1, M, N, L, H, tildeK, n_i) ≈
+          last(xue["energy"])
     bf1, bf2, bf3 = bf_energy(f1, f2, f3, S1, S2, S3, M, N, L, H, tildeK)
     @test bf1 ≈ last(xue["energyBf1"])
     @test bf2 ≈ last(xue["energyBf2"])
     @test bf3 ≈ last(xue["energyBf3"])
     S1_nrj, S2_nrj, S3_nrj = s_energy(S1, S2, S3, M, N, L, H)
-    @test S1_nrj ≈ last(xue["S1energy"]) atol=1e-15
-    @test S2_nrj ≈ last(xue["S2energy"]) atol=1e-15
-    @test S3_nrj ≈ last(xue["S3energy"]) atol=1e-15
+    @test S1_nrj ≈ last(xue["S1energy"]) atol = 1e-15
+    @test S2_nrj ≈ last(xue["S2energy"]) atol = 1e-15
+    @test S3_nrj ≈ last(xue["S3energy"]) atol = 1e-15
     @test snorm(S1, S2, S3) ≈ last(xue["Snorm"])
 end
 
@@ -146,4 +148,3 @@ end
 
 plot(x, S1, label = "S1")
 plot!(x, S2, label = "S2")
-plot!(x, S3, label = "S3")

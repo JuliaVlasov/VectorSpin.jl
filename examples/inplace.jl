@@ -34,11 +34,11 @@ function inplace()
     h_int = 0.00022 # hbar
     #h_int = 0.2
     k0 = 2.0 * ke
-    w0 = sqrt(1.0 + k0^2.0) 
+    w0 = sqrt(1.0 + k0^2.0)
     ata = 0.5
     #ata = 0.2
 
-    E1, E2, E3, A2, A3 = initialfields( H, L, N, M, a, w0, ke, k0)
+    E1, E2, E3, A2, A3 = initialfields(H, L, N, M, a, w0, ke, k0)
     f0, f1, f2, f3 = initialfunction(H, L, N, M, a, ke, ata)
 
     # test several properties include electric energy; total energy; spectrum etc. save initial data
@@ -100,21 +100,20 @@ show(to)
 #max.(abs.(E_energy-vars["E_energy"]))
 #max.(abs.(B_energy-vars["B_energy"]))
 #max.(abs.(energyy-vars["energy"]))
-p = plot(layout=(2,2))
-plot!(p[1,1], time, log.(sqrt.(abs.(Ex_energy))), label="example2590p032E.jld2")
-xlabel!(p[1,1], "Ex energy - log")
+p = plot(layout = (2, 2))
+plot!(p[1, 1], time, log.(sqrt.(abs.(Ex_energy))), label = "example2590p032E.jld2")
+xlabel!(p[1, 1], "Ex energy - log")
 #plot!(p[2,1], time, log.(abs.(E_energy)), label="julia v1")
 #xlabel!(p[2,1], "E energy - log")
-plot!(p[2,1], time, Sz, label="julia v1")
-xlabel!(p[2,1], "Sz")
-plot!(p[1,2], time, B_energy, label="julia v1")
-xlabel!(p[1,2], "B energy")
+plot!(p[2, 1], time, Sz, label = "julia v1")
+xlabel!(p[2, 1], "Sz")
+plot!(p[1, 2], time, B_energy, label = "julia v1")
+xlabel!(p[1, 2], "B energy")
 #plot!(p[2,2], time, log.(abs.((energy .- energy[begin])./energy[begin])), label="julia v1")
-plot!(p[2,2], time, (abs.((energy .- energy[begin])./energy[begin])), label="julia v1")
-xlabel!(p[2,2], "energy - log")
+plot!(p[2, 2], time, (abs.((energy .- energy[begin]) ./ energy[begin])), label = "julia v1")
+xlabel!(p[2, 2], "energy - log")
 
 #plot!(p[1,1], vec(vars["time"]), log.(vec(vars["Ex_energy"])), label="matlab", legend = :bottomright)
 #plot!(p[2,1], vec(vars["time"]), log.(vec(vars["E_energy"])), label="matlab", legend = :bottom)
 #plot!(p[1,2], vec(vars["time"]), log.(vec(vars["B_energy"])), label="matlab")
 #plot!(p[2,2], vec(vars["time"]), log.(abs.((vec(vars["energy"]).-vec(vars["energy"])[begin])./vec(vars["energy"])[begin])), label="matlab", legend = :bottomleft)
-
