@@ -13,6 +13,7 @@ SemiLagrangian = "abe12ce6-d865-11e8-314f-3f926d5bd47d"
 [compat]
 DocStringExtensions = "0.9"
 FFTW = "1"
+MAT = "0.10"
 SemiLagrangian = "0.1"
 julia = "1"
 
