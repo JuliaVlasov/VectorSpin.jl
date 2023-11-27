@@ -1,43 +1,3 @@
-"""
-$(SIGNATURES)
-"""
-function HAA!(f0, f1, f2, f3, E2, E3, A2, A3, t, L, H)
-
-    N, M = size(f0)
-
-    k = fftfreq(M, M) .* 2pi ./ L
-    partialA2 = 1im .* k .* A2
-    ifft!(partialA2)
-    partialA3 = 1im .* k .* A3
-    ifft!(partialA3)
-    AA2 = real(ifft(A2))
-    AA3 = real(ifft(A3))
-
-    v = real(partialA2) .* AA2 .+ real(partialA3) .* AA3
-    v .*= t
-
-    @inbounds for i = 2:M
-        E2[i] += t * k[i]^2 * A2[i]
-        E3[i] += t * k[i]^2 * A3[i]
-    end
-
-    @inbounds for i = 1:M
-        s = sum(view(f0, :, i))
-        AA2[i] = 2H / N * AA2[i] * s
-        AA3[i] = 2H / N * AA3[i] * s
-    end
-
-    E2 .+= t * fft(AA2)
-    E3 .+= t * fft(AA3)
-
-    translation!(f0, v, H)
-    translation!(f1, v, H)
-    translation!(f2, v, H)
-    translation!(f3, v, H)
-
-end
-
-
 export HAAOperator
 
 struct HAAOperator
@@ -74,7 +34,7 @@ $(SIGNATURES)
 \\end{aligned}
 ```
 """
-function step!(f0, f1, f2, f3, E2, E3, A2, A3, op::HAAOperator, dt)
+function step!(op::HAAOperator, f0, f1, f2, f3, E2, E3, A2, A3,  dt)
 
     nx::Int = op.adv.mesh.nx
     kx::Vector{Float64} = op.adv.mesh.kx

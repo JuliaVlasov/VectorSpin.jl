@@ -39,15 +39,15 @@ function run()
 
     for i = 1:nsteps # Loop over time
 
-        step!(f0, f1, f2, f3, E3, A3, H2fh, 0.5dt, h_int)
-        step!(f0, f1, f2, f3, E1, E2, E3, A2, A3, He, 0.5dt)
-        step!(f0, f1, f2, f3, E2, E3, A2, A3, HAA, 0.5dt)
-        step!(f0, f1, f2, f3, E2, A2, H3fh, 0.5dt, h_int)
-        step!(f0, f1, f2, f3, E1, H1f, dt)
-        step!(f0, f1, f2, f3, E2, A2, H3fh, 0.5dt, h_int)
-        step!(f0, f1, f2, f3, E2, E3, A2, A3, HAA, 0.5dt)
-        step!(f0, f1, f2, f3, E1, E2, E3, A2, A3, He, 0.5dt)
-        step!(f0, f1, f2, f3, E3, A3, H2fh, 0.5dt, h_int)
+        step!(H2fh, f0, f1, f2, f3, E3, A3, 0.5dt, h_int)
+        step!(He, f0, f1, f2, f3, E1, E2, E3, A2, A3, 0.5dt)
+        step!(HAA, f0, f1, f2, f3, E2, E3, A2, A3, 0.5dt)
+        step!(H3fh, f0, f1, f2, f3, E2, A2, 0.5dt, h_int)
+        step!(H1f, f0, f1, f2, f3, E1, dt)
+        step!(H3fh, f0, f1, f2, f3, E2, A2, 0.5dt, h_int)
+        step!(HAA, f0, f1, f2, f3, E2, E3, A2, A3, 0.5dt)
+        step!(He, f0, f1, f2, f3, E1, E2, E3, A2, A3, 0.5dt)
+        step!(H2fh, f0, f1, f2, f3, E3, A3, 0.5dt, h_int)
         
         save!(results, i*dt, f0, f2, f3, E1, E2, E3, A2, A3)
 

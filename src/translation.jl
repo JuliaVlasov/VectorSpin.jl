@@ -7,11 +7,12 @@ $(SIGNATURES)
 
 interpolate df(x - delta)
 """
-function translation!(df, delta::Vector{Float64}, H)
+function translation!(df, delta::Vector{Float64}, mesh)
 
     # first recover oldvector & get the coefficients of piecewise polynomials
 
-    N, M = size(df)
+    H = 0.5 * (mesh.vmax - mesh.vmin)
+    N, M = mesh.nv, mesh.nx
     @assert length(delta) == M
 
     a = zeros(N)
@@ -51,7 +52,7 @@ function translation!(df, delta::Vector{Float64}, H)
 
         for i = 1:N
 
-            beta::Float64 = i + alpha
+            beta = i + alpha
             newbeta = beta - N * floor(Int, beta / N)
 
             if newbeta >= 1.0

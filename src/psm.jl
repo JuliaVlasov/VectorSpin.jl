@@ -92,7 +92,7 @@ function advection!(df, adv::PSMAdvection, v, dt)
 
         for i = 1:nv
 
-            beta::Float64 = i - alpha
+            beta = i - alpha
             newbeta = beta - nv * floor(Int, beta / nv)
 
             if newbeta >= 1.0

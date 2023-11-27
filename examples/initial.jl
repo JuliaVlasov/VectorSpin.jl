@@ -1,4 +1,5 @@
 using FFTW
+using MAT
 using Plots
 using ProgressMeter
 using TimerOutputs
@@ -7,9 +8,9 @@ using VectorSpin
 const to = TimerOutput()
 
 # mesh and parameters 
-const T = 100 # final simulation time
-const M = 128 # mesh number in x direction
-const N = 128 # mesh number in v direction
+const T = 500 # final simulation time
+const M = 119 # mesh number in x direction
+const N = 129 # mesh number in v direction
 const H = 10.0 / 2 # computational domain [-H/2,H/2] in v
 const kkk = 0.5 # wave number/frequency
 const L = 2pi / kkk # computational domain [0,L] in x
@@ -49,8 +50,11 @@ function numeint(value, N)
     integral
 end
 
-function energy(f0, f1, f2, f3, E1, S1, S2, S3, M, N, L, H, tiK)
+function energy(f0, f1, f2, f3, E1, S1, S2, S3, mesh, tiK)
 
+    M, N = mesh.nx, mesh.nv
+    L = mesh.xmax - mesh.xmin
+    H = 0.5 * (mesh.vmax - mesh.vmin)
     value1 = 1:(M-1)÷2+1
     value2 = (M-1)÷2+2:M
     mub = 0.3386
@@ -181,9 +185,6 @@ function main()
     initialvalue_f2 = zeros(N, M)
     initialvalue_f3 = zeros(N, M)
 
-
-
-
     # initial value of f
 
     for k = 1:M
@@ -199,6 +200,10 @@ function main()
     f3 = initialvalue_f3
 
 
+    mesh = Mesh(0.0, L, M, -H, H, N)
+    Hv = HvOperator(mesh)
+    adv = PSMAdvection(mesh)
+    He = HeOperator(adv)
 
     t = Float64[]
     e = Float64[]
@@ -207,13 +212,13 @@ function main()
 
     @showprogress 1 for i = 2:NUM # run with time 
         # Lie splitting
-        @timeit to "Hv"   Hv!(f0, f1, f2, f3, E1, h, M, N, L, H)
-        @timeit to "He"   He!(f0, f1, f2, f3, E1, h, H)
-        @timeit to "H1fh" H1fh!(f0, f1, f2, f3, S1, S2, S3, h, M, N, L, H, tildeK)
-        @timeit to "H2fh" H2fh!(f0, f1, f2, f3, S1, S2, S3, h, M, N, L, H, tildeK)
-        @timeit to "H3fh" H3fh!(f0, f1, f2, f3, S1, S2, S3, h, M, N, L, H, tildeK)
-        push!(t, (i-1)*h)
-        push!(e, energy(f0, f1, f2, f3, E1, S1, S2, S3, M, N, L, H, tildeK))
+        @timeit to "Hv" step!(Hv, f0, f1, f2, f3, E1, h, mesh)
+        @timeit to "He" step!(He, f0, f1, f2, f3, E1, h)
+        @timeit to "H1fh" H1fh!(f0, f1, f2, f3, S1, S2, S3, h, mesh, tildeK)
+        @timeit to "H2fh" H2fh!(f0, f1, f2, f3, S1, S2, S3, h, mesh, tildeK)
+        @timeit to "H3fh" H3fh!(f0, f1, f2, f3, S1, S2, S3, h, mesh, tildeK)
+        push!(t, (i - 1) * h)
+        push!(e, energy(f0, f1, f2, f3, E1, S1, S2, S3, mesh, tildeK))
     end
 
 
@@ -225,3 +230,6 @@ t, e = main()
 
 show(to)
 plot(t, log.(e))
+eref = matread("ref.mat")["eref"]
+tref = collect(eachindex(eref)) .* h
+plot!(tref, log.(eref))

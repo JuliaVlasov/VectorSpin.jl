@@ -125,16 +125,16 @@ function run_simulation(nbdt, sz, dt)
 
     advd = AdvectionData(adv, f, pvar)
 
-    time = Float64[]
+    t = Float64[]
     el = Float64[]
     @showprogress 1 for i = 1:nbdt
         while SemiLagrangian.advection!(advd)
         end
-        push!(time, advd.time_cur)
+        push!(t, advd.time_cur)
         ee = compute_ee(advd)
         push!(el, 0.5 * log(ee))
     end
-    return time, el
+    return t, el
 end
 
 nt = 1000
@@ -144,8 +144,8 @@ t = range(0.0, stop = tf, length = nt)
 
 sz = (128, 256)
 dt = tf / nt
-@time time, el = run_simulation(nt, sz, dt)
-@time nrj = landau_damping(tf, nt);
+nrj = landau_damping(tf, nt);
 plot(t, nrj; label = "LocalImplementation")
 plot!(t, -0.1533 * t .- 5.50; label = "-0.1533t.-5.5")
-plot!(time, el, label = "SemiLagrangian")
+t, el = run_simulation(nt, sz, dt)
+plot!(t, el, label = "SemiLagrangian")

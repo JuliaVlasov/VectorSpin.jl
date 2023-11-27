@@ -1,3 +1,11 @@
+export H1fhOperator
+
+struct H1fhOperator
+
+    
+
+end
+
 export H1fh!
 
 """
@@ -7,49 +15,45 @@ compute the subsystem Hs1
 M is even number
 
 """
-function H1fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
+function H1fh!(f0, f1, f2, f3, S1, S2, S3, dt, mesh, tiK)
 
     K_xc = tiK
     n_i = 1.0
     mub = 0.3386
 
-    k = fftfreq(M, M)
-
     B10 = -K_xc * n_i * 0.5 * S1
     fS1 = fft(S1)
 
-    partialB1 = -((K_xc * n_i * 0.5 * 2π * 1im / L .* k)) .* fS1
-    ifft!(partialB1)
-
-    partial2S1 = (-((2pi / L .* k)) .^ 2) .* fS1
-    ifft!(partial2S1)
-
-    v1 = zeros(M)
-    v2 = zeros(M)
-    for i = 1:M
-        v1[i] = (t * real(partialB1[i]) * mub)
+    tmp = -(K_xc * n_i * 0.5 * 1im .* mesh.kx) .* fS1
+    ifft!(tmp)
+    v1 = zeros(mesh.nx)
+    v2 = zeros(mesh.nx)
+    for i = 1:mesh.nx
+        v1[i] = (dt * real(tmp[i]) * mub)
         v2[i] = -v1[i]
     end
 
+    tmp .= -mesh.kx .^ 2 .* fS1
+    ifft!(tmp)
 
     u1 = 0.5 .* f0 .+ 0.5 .* f1
     u2 = 0.5 .* f0 .- 0.5 .* f1
 
-    translation!(u1, v1, H)
-    translation!(u2, v2, H)
+    H = 0.5 * ( mesh.vmax - mesh.vmin)
+    translation!(u1, v1, mesh)
+    translation!(u2, v2, mesh)
 
-    f2 .= cos.(t * B10') .* f2 .- sin.(t * B10') .* f3
-    f3 .= sin.(t * B10') .* f2 .+ cos.(t * B10') .* f3
-
+    f2 .= cos.(dt * B10') .* f2 .- sin.(dt * B10') .* f3
+    f3 .= sin.(dt * B10') .* f2 .+ cos.(dt * B10') .* f3
 
     S2t = similar(S1)
     S3t = similar(S2)
-    for i = 1:M
+    for i = 1:mesh.nx
 
-        temi = K_xc / 4 * sum(view(f1, :, i)) * 2H / N + 0.01475 * real(partial2S1[i])
+        temi = K_xc / 4 * sum(view(f1, :, i)) * mesh.dv + 0.01475 * real(tmp[i])
 
-        S2t[i] = cos(t * temi) * S2[i] + sin(t * temi) * S3[i]
-        S3t[i] = -sin(t * temi) * S2[i] + cos(t * temi) * S3[i]
+        S2t[i] = cos(dt * temi) * S2[i] + sin(dt * temi) * S3[i]
+        S3t[i] = -sin(dt * temi) * S2[i] + cos(dt * temi) * S3[i]
 
     end
 
@@ -60,3 +64,4 @@ function H1fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
     S3 .= S3t
 
 end
+

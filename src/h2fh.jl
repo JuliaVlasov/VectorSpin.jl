@@ -1,43 +1,3 @@
-"""
-compute the subsystem H2
-
-$(SIGNATURES)
-
-"""
-function H2fh!(f0, f1, f2, f3, E3, A3, t, L, H, h_int)
-
-    N, M = size(f0)
-
-    k = fftfreq(M, M) .* 2π ./ L
-
-    partialA3 = real(ifft(1im .* k .* A3))
-    partial2A3 = real(ifft(-k .^ 2 .* A3))
-
-    v1 = t .* h_int .* partial2A3 ./ sqrt(3)
-    v2 = -v1
-
-    u1 = 0.5 .* f0 .+ 0.5 * sqrt(3) .* f2
-    u2 = 0.5 .* f0 .- 0.5 * sqrt(3) .* f2
-
-    translation!(u1, v1, H)
-    translation!(u2, v2, H)
-
-    ff2 = complex(f2)
-    fft!(ff2, 2)
-    @inbounds for i = 2:M
-        E3[i] += -t * h_int * 1im * k[i] * sum(ff2[:, i]) * 2 * H / N
-    end
-
-    f0 .= u1 .+ u2
-    f2 .= u1 ./ sqrt(3) .- u2 ./ sqrt(3)
-
-    u1 .= cos.(t * partialA3') .* f1 .+ sin.(t * partialA3') .* f3
-    u2 .= -sin.(t * partialA3') .* f1 .+ cos.(t * partialA3') .* f3
-
-    f1 .= u1
-    f3 .= u2
-end
-
 export H2fhOperator
 
 struct H2fhOperator
@@ -74,7 +34,7 @@ compute the subsystem H2
 $(SIGNATURES)
 
 """
-function step!(f0, f1, f2, f3, E3, A3, op::H2fhOperator, dt, h_int)
+function step!(op::H2fhOperator, f0, f1, f2, f3, E3, A3, dt, h_int)
 
     kx::Vector{Float64} = op.adv.mesh.kx
     dv::Float64 = op.adv.mesh.dv
@@ -119,45 +79,45 @@ $(SIGNATURES)
 compute the subsystem Hs2
 
 """
-function H2fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
+function H2fh!(f0, f1, f2, f3, S1, S2, S3, t, mesh, tiK)
 
     K_xc = tiK
     n_i = 1.0
     mub = 0.3386
 
-    partialB2 = zeros(ComplexF64, M)
-    partial2S2 = zeros(ComplexF64, M)
+    partialB2 = zeros(ComplexF64, mesh.nx)
+    partial2S2 = zeros(ComplexF64, mesh.nx)
     B20 = -K_xc * n_i * 0.5 * S2
-    k = fftfreq(M, M)
 
     f1 .= cos.(t * B20') .* f1 .+ sin.(t * B20') .* f3
     f3 .= -sin.(t * B20') .* f1 .+ cos.(t * B20') .* f3
 
     fS2 = fft(S2)
 
-    partialB2 .= (-((K_xc * n_i * 0.5 * 2pi * 1im / L .* k)) .* fS2)
+    partialB2 .= (-((K_xc * n_i * 0.5 * 1im .* mesh.kx)) .* fS2)
     ifft!(partialB2)
-    partial2S2 = (-((2pi / L * k) .^ 2) .* fS2)
+    partial2S2 = (-((mesh.kx) .^ 2) .* fS2)
     ifft!(partial2S2)
 
-    v1 = zeros(M)
-    v2 = zeros(M)
-    for i = 1:M
+    v1 = zeros(mesh.nx)
+    v2 = zeros(mesh.nx)
+    for i = 1:mesh.nx
         v1[i] = (t * real(partialB2[i]) * mub)
         v2[i] = -v1[i]
     end
 
-    S1t = zeros(M)
-    S3t = zeros(M)
+    S1t = zeros(mesh.nx)
+    S3t = zeros(mesh.nx)
 
     u1 = 0.5 .* f0 .+ 0.5 .* f2
     u2 = 0.5 .* f0 .- 0.5 .* f2
 
-    translation!(u1, v1, H)
-    translation!(u2, v2, H)
+    H = 0.5 * (mesh.vmax - mesh.vmin)
+    translation!(u1, v1, mesh)
+    translation!(u2, v2, mesh)
 
-    for i = 1:M
-        temi = K_xc / 4 * sum(f2[:, i]) * 2H / N + 0.01475 * real(partial2S2[i])
+    for i = 1:mesh.nx
+        temi = K_xc / 4 * sum(f2[:, i]) * mesh.dv + 0.01475 * real(partial2S2[i])
         S1t[i] = cos(t * temi) * S1[i] - sin(t * temi) * S3[i]
         S3t[i] = sin(t * temi) * S1[i] + cos(t * temi) * S3[i]
     end

@@ -26,6 +26,9 @@ H = 10.0 / 2 # computational domain [-H/2,H/2] in v
 k = 0.5      # wave number/frequency
 L = 2π / k   # computational domain [0,L] in x
 
+mesh = Mesh(0, L, M, -H, H, N)
+
+Hv = HvOperator(mesh)
 
 a = 0.001
 x = (0:(M-1)) .* L / M # mesh in x
@@ -46,6 +49,7 @@ f2 = zeros(N, M)
 f3 = zeros(N, M)
 
 t = 0.0
-E1 = Hv!(f0, f1, f2, f3, t, M, N, L, H)
-plot(x, real(ifft(E1)) .- E_exact)
+step!(Hv, f0, f1, f2, f3, E1, t)
+plot(x, real(ifft(E1)), label = "exact")
+plot!(x, E_exact, label = "computed")
 # -

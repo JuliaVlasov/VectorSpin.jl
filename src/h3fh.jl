@@ -1,42 +1,3 @@
-"""
-$(SIGNATURES)
-"""
-function H3fh!(f0, f1, f2, f3, E2, A2, t, L, H, h_int)
-
-    N, M = size(f0)
-
-    # use FFT to compute A2_x; A2_xx
-    k = 2π ./ L .* fftfreq(M, M)
-    partialA2 = 1im .* k .* A2
-    ifft!(partialA2)
-    partial2A2 = -k .^ 2 .* A2
-    ifft!(partial2A2)
-    ff3 = complex(f3)
-    fft!(ff3, 2)
-
-    # solve transport problem in v direction by Semi-Lagrangain method
-    v1 = -t * h_int * real(partial2A2) ./ sqrt(3)
-    v2 = -v1
-
-    u1 = 0.5 * f0 .+ 0.5 * sqrt(3) * f3
-    u2 = 0.5 * f0 .- 0.5 * sqrt(3) * f3
-
-    translation!(u1, v1, H)
-    translation!(u2, v2, H)
-
-    f0 .= u1 .+ u2
-    f3 .= u1 ./ sqrt(3) .- u2 ./ sqrt(3)
-    u1 .= cos.(t * real(partialA2')) .* f1 .+ sin.(t * real(partialA2')) .* f2
-    u2 .= -sin.(t * real(partialA2')) .* f1 .+ cos.(t * real(partialA2')) .* f2
-
-    f1 .= u1
-    f2 .= u2
-
-    @inbounds for i = 2:M
-        E2[i] += t * h_int * 1im * k[i] * sum(view(ff3, :, i)) * 2H / N
-    end
-end
-
 export H3fhOperator
 
 struct H3fhOperator
@@ -65,13 +26,10 @@ struct H3fhOperator
 
 end
 
-
-
-
 """
 $(SIGNATURES)
 """
-function step!(f0, f1, f2, f3, E2, A2, op, dt, h_int)
+function step!(op :: H3fhOperator, f0, f1, f2, f3, E2, A2, dt, h_int)
 
     nx::Int = op.adv.mesh.nx
     dv::Float64 = op.adv.mesh.dv
@@ -107,8 +65,6 @@ function step!(f0, f1, f2, f3, E2, A2, op, dt, h_int)
     end
 end
 
-
-
 export H3fh!
 
 """
@@ -116,13 +72,13 @@ $(SIGNATURES)
 
 compute the subsystem Hs3
 """
-function H3fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
+function H3fh!(f0, f1, f2, f3, S1, S2, S3, t, mesh, tiK)
 
     K_xc = tiK
     n_i = 1.0
     mub = 0.3386
 
-    k = fftfreq(M, M) .* 2π ./ L
+    k = mesh.kx
 
     B30 = -K_xc * n_i * 0.5 * S3
     fS3 = fft(S3)
@@ -131,17 +87,17 @@ function H3fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
     partial2S3 = -(k .^ 2) .* fS3
     ifft!(partial2S3)
 
-    S1t = zeros(M)
-    S2t = zeros(M)
-    for i = 1:M
-        temi = K_xc / 4 * sum(view(f3, :, i)) * 2H / N + 0.01475 * real(partial2S3[i])
+    S1t = zeros(mesh.nx)
+    S2t = zeros(mesh.nx)
+    for i = 1:mesh.nx
+        temi = K_xc / 4 * sum(view(f3, :, i)) * mesh.dv + 0.01475 * real(partial2S3[i])
         S1t[i] = cos(t * temi) * S1[i] + sin(t * temi) * S2[i]
         S2t[i] = -sin(t * temi) * S1[i] + cos(t * temi) * S2[i]
     end
 
-    v1 = zeros(M)
-    v2 = zeros(M)
-    for i = 1:M
+    v1 = zeros(mesh.nx)
+    v2 = zeros(mesh.nx)
+    for i = 1:mesh.nx
         v1[i] = (t * real(partialB3[i]) * mub)
         v2[i] = -v1[i]
     end
@@ -149,13 +105,14 @@ function H3fh!(f0, f1, f2, f3, S1, S2, S3, t, M, N, L, H, tiK)
     u1 = 0.5 * f0 .+ 0.5 * f3
     u2 = 0.5 * f0 .- 0.5 * f3
 
-    translation!(u1, v1, H)
-    translation!(u2, v2, H)
+    H = 0.5 * (mesh.vmax - mesh.vmin)
+    translation!(u1, v1, mesh)
+    translation!(u2, v2, mesh)
 
     f0 .= u1 .+ u2
     f3 .= u1 .- u2
 
-    for i = 1:M, j = 1:N
+    for i = 1:mesh.nx, j = 1:mesh.nv
         u1[j, i] = cos(t * B30[i]) * f1[j, i] - sin(t * B30[i]) .* f2[j, i]
         u2[j, i] = sin(t * B30[i]) * f1[j, i] + cos(t * B30[i]) .* f2[j, i]
     end
