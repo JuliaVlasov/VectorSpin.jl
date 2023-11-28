@@ -84,13 +84,18 @@ function main(T)
     push!(e, ex_energy(E1, L, M))
 
     Hv = HvOperator(mesh)
+    adv = PSMAdvection(mesh)
+    He = HeOperator(adv)
+    H1fh = H1fhOperator(adv)
+    H2fh = H2fhOperator(adv)
+    H3fh = H3fhOperator(adv)
 
     for i = 1:5000
         step!(Hv, f0, f1, f2, f3, E1, h)
-        He!(f0, f1, f2, f3, E1, h, mesh)
-        H1fh!(f0, f1, f2, f3, S1, S2, S3, h, mesh, tildeK)
-        H2fh!(f0, f1, f2, f3, S1, S2, S3, h, mesh, tildeK)
-        H3fh!(f0, f1, f2, f3, S1, S2, S3, h, mesh, tildeK)
+        step!(He, f0, f1, f2, f3, E1, h)
+        step!(H1fh, f0, f1, f2, f3, S1, S2, S3, h, tildeK)
+        step!(H2fh, f0, f1, f2, f3, S1, S2, S3, h, tildeK)
+        step!(H3fh, f0, f1, f2, f3, S1, S2, S3, h, tildeK)
         push!(t, i * h)
         push!(e, ex_energy(E1, L, M))
     end
