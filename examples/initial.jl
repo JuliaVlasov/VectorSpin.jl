@@ -5,10 +5,14 @@ using ProgressMeter
 using TimerOutputs
 using VectorSpin
 
+import Pkg
+Pkg.add(url="https://github.com/johnbcoughlin/DispersionRelations.jl")
+using DispersionRelations
+
 const to = TimerOutput()
 
 # mesh and parameters 
-const T = 500 # final simulation time
+const T = 100 # final simulation time
 const M = 119 # mesh number in x direction
 const N = 129 # mesh number in v direction
 const H = 10.0 / 2 # computational domain [-H/2,H/2] in v
@@ -55,26 +59,15 @@ function energy(f0, f1, f2, f3, E1, S1, S2, S3, mesh, tiK)
     M, N = mesh.nx, mesh.nv
     L = mesh.xmax - mesh.xmin
     H = 0.5 * (mesh.vmax - mesh.vmin)
-    value1 = 1:(M-1)÷2+1
-    value2 = (M-1)÷2+2:M
     mub = 0.3386
     h_int = 2.0 * mub
     aj0 = 0.01475 * h_int / 2.0
     K_xc = tiK
     n_i = 1.0
 
-    S1value = fft(S1)
-    S2value = fft(S2)
-    S3value = fft(S3)
-    S1value[value1] = ((2pi * 1im / L * (value1 .- 1))) .* S1value[value1]
-    S1value[value2] = ((2pi * 1im / L * (value2 .- 1 .- M))) .* S1value[value2]
-    SS1value = real(ifft(S1value))
-    S2value[value1] = ((2pi * 1im / L * (value1 .- 1))) .* S2value[value1]
-    S2value[value2] = ((2pi * 1im / L * (value2 .- 1 .- M))) .* S2value[value2]
-    SS2value = real(ifft(S2value))
-    S3value[value1] = ((2pi * 1im / L * (value1 .- 1))) .* S3value[value1]
-    S3value[value2] = ((2pi * 1im / L * (value2 .- 1 .- M))) .* S3value[value2]
-    SS3value = real(ifft(S3value))
+    SS1value = real(ifft(1im .* mesh.kx .* fft(S1)))
+    SS2value = real(ifft(1im .* mesh.kx .* fft(S2)))
+    SS3value = real(ifft(1im .* mesh.kx .* fft(S3)))
 
     EE1value = zeros(M)
     EE1value = real(ifft(E1))
@@ -103,10 +96,10 @@ function energy(f0, f1, f2, f3, E1, S1, S2, S3, mesh, tiK)
         DS3value[j] = aj0 * n_i * (SS3value[j]^2) * L / M
     end
 
-    energykinetic = sum(sum(ff0value))
-    energyBf1 = sum(sum(ff1value))
-    energyBf2 = sum(sum(ff2value))
-    energyBf3 = sum(sum(ff3value))
+    energykinetic = sum(ff0value)
+    energyBf1 = sum(ff1value)
+    energyBf2 = sum(ff2value)
+    energyBf3 = sum(ff3value)
     S1energy = sum(DS1value)
     S2energy = sum(DS2value)
     S3energy = sum(DS3value)
@@ -232,7 +225,6 @@ end
 t, e = main()
 
 show(to)
-plot(t, log.(e), label = "new")
-eref = matread("ref.mat")["eref"]
-tref = collect(eachindex(eref)) .* h
-plot!(tref, log.(eref), label = "ref")
+plot(t, e, label = "ex energy", yscale = :log10)
+line, γ = fit_complex_frequency(t, e)
+plot!(t, line, label = "γ = $(imag(γ))")
