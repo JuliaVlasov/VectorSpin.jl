@@ -1,3 +1,5 @@
+using .Threads
+
 export HeOperator
 
 struct HeOperator
@@ -20,8 +22,13 @@ end
 $(SIGNATURES)
  
 compute the first subsystem He()
+
+```math
+f_t - Ef_v = 0
+```
+
 """
-function step!( op::HeOperator, f0, f1, f2, f3, E1, E2, E3, A2, A3, dt)
+function step!(op::HeOperator, f0, f1, f2, f3, E1, E2, E3, A2, A3, dt)
 
     A2 .-= dt .* E2
     A3 .-= dt .* E3
@@ -35,30 +42,10 @@ function step!( op::HeOperator, f0, f1, f2, f3, E1, E2, E3, A2, A3, dt)
 
 end
 
-export He!
-
-"""
-$(SIGNATURES)
-
-subsystem for He:
-
-f_t-Ef_v=0;
-
-"""
-function He!(f0, f1, f2, f3, E1, t, H)
-
-    e = t .* real(ifft(E1))
-
-    translation!(f0, e, H)
-    translation!(f1, e, H)
-    translation!(f2, e, H)
-    translation!(f3, e, H)
-
-end
 
 function step!(op::HeOperator, f0, f1, f2, f3, E1, dt)
 
-    op.e .= - real(ifft(E1))
+    op.e .= -real(ifft(E1))
 
     advection!(f0, op.adv, op.e, dt)
     advection!(f1, op.adv, op.e, dt)
@@ -66,4 +53,3 @@ function step!(op::HeOperator, f0, f1, f2, f3, E1, dt)
     advection!(f3, op.adv, op.e, dt)
 
 end
-

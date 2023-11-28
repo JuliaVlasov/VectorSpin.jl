@@ -34,7 +34,7 @@ $(SIGNATURES)
 \\end{aligned}
 ```
 """
-function step!(op::HAAOperator, f0, f1, f2, f3, E2, E3, A2, A3,  dt)
+function step!(op::HAAOperator, f0, f1, f2, f3, E2, E3, A2, A3, dt)
 
     nx::Int = op.adv.mesh.nx
     kx::Vector{Float64} = op.adv.mesh.kx

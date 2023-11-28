@@ -2,22 +2,22 @@ export H1fhOperator
 
 struct H1fhOperator
 
-    adv :: AbstractAdvection
-    mesh :: Mesh
-    B10 :: Vector{Float64}
-    fS1 :: Vector{ComplexF64}
-    dS1 :: Vector{ComplexF64}
-    d2S1 :: Vector{ComplexF64}
-    S2t :: Vector{Float64}
-    S3t :: Vector{Float64}
-    v1 :: Vector{Float64}
-    v2 :: Vector{Float64}
-    u1 :: Matrix{Float64}
-    u2 :: Matrix{Float64}
-    n_i :: Float64
-    mub :: Float64
+    adv::AbstractAdvection
+    mesh::Mesh
+    B10::Vector{Float64}
+    fS1::Vector{ComplexF64}
+    dS1::Vector{ComplexF64}
+    d2S1::Vector{ComplexF64}
+    S2t::Vector{Float64}
+    S3t::Vector{Float64}
+    v1::Vector{Float64}
+    v2::Vector{Float64}
+    u1::Matrix{Float64}
+    u2::Matrix{Float64}
+    n_i::Float64
+    mub::Float64
 
-    function H1fhOperator( adv; n_i = 1.0, mub =  0.3386)
+    function H1fhOperator(adv; n_i = 1.0, mub = 0.3386)
 
         mesh = adv.mesh
         B10 = zeros(mesh.nx)
@@ -49,7 +49,7 @@ compute the subsystem Hs1
 M is even number
 
 """
-function step!(op, f0, f1, f2, f3, S1, S2, S3, dt, tiK)
+function step!(op::H1fhOperator, f0, f1, f2, f3, S1, S2, S3, dt, tiK)
 
     K_xc = tiK
     n_i = op.n_i
@@ -62,10 +62,10 @@ function step!(op, f0, f1, f2, f3, S1, S2, S3, dt, tiK)
     ifft!(op.dS1)
     for i = 1:op.mesh.nx
         op.v1[i] = -(dt * real(op.dS1[i]) * mub)
-        op.v2[i] = - op.v1[i]
+        op.v2[i] = -op.v1[i]
     end
 
-    op.d2S1 .= - op.mesh.kx .^ 2 .* op.fS1
+    op.d2S1 .= -op.mesh.kx .^ 2 .* op.fS1
     ifft!(op.d2S1)
 
     op.u1 .= 0.5 .* f0 .+ 0.5 .* f1
@@ -93,4 +93,3 @@ function step!(op, f0, f1, f2, f3, S1, S2, S3, dt, tiK)
     S3 .= op.S3t
 
 end
-

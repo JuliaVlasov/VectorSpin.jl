@@ -205,6 +205,8 @@ function main()
     adv = PSMAdvection(mesh)
     He = HeOperator(adv)
     H1fh = H1fhOperator(adv)
+    H2fh = H2fhOperator(adv)
+    H3fh = H3fhOperator(adv)
 
     t = Float64[]
     e = Float64[]
@@ -216,8 +218,8 @@ function main()
         @timeit to "Hv" step!(Hv, f0, f1, f2, f3, E1, h)
         @timeit to "He" step!(He, f0, f1, f2, f3, E1, h)
         @timeit to "H1fh" step!(H1fh, f0, f1, f2, f3, S1, S2, S3, h, tildeK)
-        @timeit to "H2fh" H2fh!(f0, f1, f2, f3, S1, S2, S3, h, mesh, tildeK)
-        @timeit to "H3fh" H3fh!(f0, f1, f2, f3, S1, S2, S3, h, mesh, tildeK)
+        @timeit to "H2fh" step!(H2fh, f0, f1, f2, f3, S1, S2, S3, h, tildeK)
+        @timeit to "H3fh" step!(H3fh, f0, f1, f2, f3, S1, S2, S3, h, tildeK)
         push!(t, (i - 1) * h)
         push!(e, energy(f0, f1, f2, f3, E1, S1, S2, S3, mesh, tildeK))
     end
