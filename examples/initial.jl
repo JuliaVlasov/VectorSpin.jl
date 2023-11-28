@@ -204,17 +204,18 @@ function main()
     Hv = HvOperator(mesh)
     adv = PSMAdvection(mesh)
     He = HeOperator(adv)
+    H1fh = H1fhOperator(adv)
 
     t = Float64[]
     e = Float64[]
     push!(t, 0.0)
-    push!(e, energy(f0, f1, f2, f3, E1, S1, S2, S3, M, N, L, H, tildeK))
+    push!(e, energy(f0, f1, f2, f3, E1, S1, S2, S3, mesh, tildeK))
 
     @showprogress 1 for i = 2:NUM # run with time 
         # Lie splitting
-        @timeit to "Hv" step!(Hv, f0, f1, f2, f3, E1, h, mesh)
+        @timeit to "Hv" step!(Hv, f0, f1, f2, f3, E1, h)
         @timeit to "He" step!(He, f0, f1, f2, f3, E1, h)
-        @timeit to "H1fh" H1fh!(f0, f1, f2, f3, S1, S2, S3, h, mesh, tildeK)
+        @timeit to "H1fh" step!(H1fh, f0, f1, f2, f3, S1, S2, S3, h, tildeK)
         @timeit to "H2fh" H2fh!(f0, f1, f2, f3, S1, S2, S3, h, mesh, tildeK)
         @timeit to "H3fh" H3fh!(f0, f1, f2, f3, S1, S2, S3, h, mesh, tildeK)
         push!(t, (i - 1) * h)
@@ -229,7 +230,7 @@ end
 t, e = main()
 
 show(to)
-plot(t, log.(e))
+plot(t, log.(e), label = "new")
 eref = matread("ref.mat")["eref"]
 tref = collect(eachindex(eref)) .* h
-plot!(tref, log.(eref))
+plot!(tref, log.(eref), label = "ref")
