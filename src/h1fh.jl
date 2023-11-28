@@ -53,7 +53,7 @@ function step!(op::H1fhOperator, f0, f1, f2, f3, S1, S2, S3, dt, tiK)
     ifft!(op.partial)
 
     for i in eachindex(op.partial)
-        op.v1[i] = -dt * real(op.partial[i]) * mub
+        op.v1[i] = - real(op.partial[i]) * mub
         op.v2[i] = -op.v1[i]
     end
 

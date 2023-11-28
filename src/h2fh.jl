@@ -106,7 +106,7 @@ function step!(op::H2fhOperator, f0, f1, f2, f3, S1, S2, S3, dt, tiK)
     ifft!(op.partial)
 
     for i = 1:op.mesh.nx
-        op.v1[i] = -dt * real(op.partial[i]) * op.mub
+        op.v1[i] = -real(op.partial[i]) * op.mub
         op.v2[i] = -op.v1[i]
     end
 
