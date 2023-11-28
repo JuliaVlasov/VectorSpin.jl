@@ -85,7 +85,12 @@ using MAT
     vmin, vmax = -H, H
     nx, nv = M, N
     mesh = Mesh(xmin, xmax, nx, vmin, vmax, nv)
+    adv = PSMAdvection(mesh)
     Hv = HvOperator(mesh)
+    He = HeOperator(adv)
+    H1fh = H1fhOperator(adv)
+    H2fh = H2fhOperator(adv)
+    H3fh = H3fhOperator(adv)
 
     # Lie splitting
     step!(Hv, f0, f1, f2, f3, E1, h )
@@ -98,7 +103,7 @@ using MAT
     @test f2 ≈ hv["f2"]
     @test f3 ≈ hv["f3"]
     
-    He!(f0, f1, f2, f3, E1, h, mesh)
+    step!(He, f0, f1, f2, f3, E1, h)
     
     he = matread("he.mat")
     
@@ -107,7 +112,7 @@ using MAT
     @test f2 ≈ he["f2"]
     @test f3 ≈ he["f3"]
     
-    H1fh!(f0, f1, f2, f3, S1, S2, S3, h, mesh, tildeK)
+    step!(H1fh, f0, f1, f2, f3, S1, S2, S3, h, tildeK)
     
     h1fh = matread("h1fh.mat")
     
@@ -118,7 +123,7 @@ using MAT
     @test S2 ≈ vec(h1fh["S2"])
     @test S3 ≈ vec(h1fh["S3"])
     
-    H2fh!(f0, f1, f2, f3, S1, S2, S3, h, mesh, tildeK)
+    step!(H2fh, f0, f1, f2, f3, S1, S2, S3, h, tildeK)
     
     h2fh = matread("h2fh.mat")
     
@@ -129,7 +134,7 @@ using MAT
     @test S1 ≈ vec(h2fh["S1"])
     @test S3 ≈ vec(h2fh["S3"])
     
-    H3fh!(f0, f1, f2, f3, S1, S2, S3, h, mesh, tildeK)
+    step!(H3fh, f0, f1, f2, f3, S1, S2, S3, h, tildeK)
    
     h3fh = matread("h3fh.mat")
     
