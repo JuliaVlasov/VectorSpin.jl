@@ -1,3 +1,5 @@
+using .Threads
+
 export Hv!
 
 export HvOperator
@@ -9,6 +11,7 @@ struct HvOperator
     ff1::Matrix{ComplexF64}
     ff2::Matrix{ComplexF64}
     ff3::Matrix{ComplexF64}
+    expv:: Matrix{ComplexF64}
 
     function HvOperator(mesh)
 
@@ -16,8 +19,9 @@ struct HvOperator
         ff1 = zeros(ComplexF64, mesh.nx, mesh.nv)
         ff2 = zeros(ComplexF64, mesh.nx, mesh.nv)
         ff3 = zeros(ComplexF64, mesh.nx, mesh.nv)
+        expv = exp.(-1im .* mesh.kx .* mesh.vnode')
 
-        new(mesh, ff0, ff1, ff2, ff3)
+        new(mesh, ff0, ff1, ff2, ff3, expv)
 
     end
 
@@ -42,44 +46,46 @@ function step!(op::HvOperator, f0, f1, f2, f3, E1, dt)
     v = op.mesh.vnode
     k_fre = op.mesh.kx
 
-    transpose!(op.ff0, f0)
-    transpose!(op.ff1, f1)
-    transpose!(op.ff2, f2)
-    transpose!(op.ff3, f3)
+    @sync begin
 
-    fft!(op.ff0, 1)
-    fft!(op.ff1, 1)
-    fft!(op.ff2, 1)
-    fft!(op.ff3, 1)
+        @spawn begin
+            transpose!(op.ff0, f0)
+            fft!(op.ff0, 1)
+            op.ff0 .*= op.expv .^dt
+            E1 .= vec(sum(op.ff0, dims = 2))
+            E1[1] = 0.0
 
-    for i in eachindex(v), j in eachindex(k_fre)
+            for i = 2:op.mesh.nx
+                E1[i] *= op.mesh.dv / (-1im * k_fre[i])
+            end
 
-        expv = exp(-1im * k_fre[j] * v[i] * dt)
+            ifft!(op.ff0, 1)
+            transpose!(f0, real(op.ff0))
+        end
 
-        op.ff0[j, i] *= expv
-        op.ff1[j, i] *= expv
-        op.ff2[j, i] *= expv
-        op.ff3[j, i] *= expv
+        @spawn begin
+            transpose!(op.ff1, f1)
+            fft!(op.ff1, 1)
+            op.ff1 .*= op.expv .^dt
+            ifft!(op.ff1, 1)
+            transpose!(f1, real(op.ff1))
+        end
 
+        @spawn begin
+            transpose!(op.ff2, f2)
+            fft!(op.ff2, 1)
+            op.ff2 .*= op.expv .^dt
+            ifft!(op.ff2, 1)
+            transpose!(f2, real(op.ff2))
+        end
+
+        @spawn begin
+            transpose!(op.ff3, f3)
+            fft!(op.ff3, 1)
+            op.ff3 .*= op.expv .^dt
+            ifft!(op.ff3, 1)
+            transpose!(f3, real(op.ff3))
+        end
     end
-
-    E1t = vec(sum(op.ff0, dims = 2))
-    E1t[1] = 0.0
-
-    for i = 2:op.mesh.nx
-        E1t[i] *= op.mesh.dv / (-1im * k_fre[i])
-    end
-
-    ifft!(op.ff0, 1)
-    ifft!(op.ff1, 1)
-    ifft!(op.ff2, 1)
-    ifft!(op.ff3, 1)
-
-    transpose!(f0, real(op.ff0))
-    transpose!(f1, real(op.ff1))
-    transpose!(f2, real(op.ff2))
-    transpose!(f3, real(op.ff3))
-
-    E1 .= E1t
 
 end
