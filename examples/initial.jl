@@ -213,14 +213,14 @@ function main(T, M, N, H, kkk, L, h, a)
 end
 
 # mesh and parameters 
-T = 10 # final simulation time
-M = 219 # mesh number in x direction
-N = 229 # mesh number in v direction
+T = 500 # final simulation time
+M = 119 # mesh number in x direction
+N = 129 # mesh number in v direction
 H = 10.0 / 2 # computational domain [-H/2,H/2] in v
 kx = 0.5 # wave number/frequency
 L = 2pi / kx # computational domain [0,L] in x
 tildeK = 0.1598 # normalized parameter tildeK
-h = 0.02 # time step size
+h = 0.1 # time step size
 a = 0.001 # perturbation for f
 
 t, e = main(T, M, N, H, kx, L, h, a)

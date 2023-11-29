@@ -42,10 +42,12 @@ function step!(op::HeOperator, f0, f1, f2, f3, E1, E2, E3, A2, A3, dt)
 
     op.e .= real(ifft(E1))
 
-    advection!(f0, op.adv0, op.e, dt)
-    advection!(f1, op.adv1, op.e, dt)
-    advection!(f2, op.adv2, op.e, dt)
-    advection!(f3, op.adv3, op.e, dt)
+    @sync begin
+       @spawn advection!(f0, op.adv0, op.e, dt)
+       @spawn advection!(f1, op.adv1, op.e, dt)
+       @spawn advection!(f2, op.adv2, op.e, dt)
+       @spawn advection!(f3, op.adv3, op.e, dt)
+    end
 
 end
 
