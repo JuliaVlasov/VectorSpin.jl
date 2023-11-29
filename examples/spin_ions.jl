@@ -2,6 +2,7 @@ using FFTW
 using MAT
 using Plots
 using VectorSpin
+using ProgressMeter
 
 function main(T)
     M = 119 # mesh number in x direction
@@ -90,7 +91,7 @@ function main(T)
     H2fh = H2fhOperator(adv)
     H3fh = H3fhOperator(adv)
 
-    for i = 1:5000
+    @showprogress 1 for i = 1:5000
         step!(Hv, f0, f1, f2, f3, E1, h)
         step!(He, f0, f1, f2, f3, E1, h)
         step!(H1fh, f0, f1, f2, f3, S1, S2, S3, h, tildeK)
