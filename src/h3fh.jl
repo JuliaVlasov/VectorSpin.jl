@@ -2,7 +2,8 @@ export H3fhOperator
 
 struct H3fhOperator
 
-    adv::AbstractAdvection
+    adv1::AbstractAdvection
+    adv2::AbstractAdvection
     mesh::Mesh
     partial::Vector{ComplexF64}
     fS3::Vector{ComplexF64}
@@ -14,11 +15,12 @@ struct H3fhOperator
     n_i::Float64
     mub::Float64
 
-    function H3fhOperator(adv; n_i = 1.0, mub = 0.3386)
+    function H3fhOperator(mesh; n_i = 1.0, mub = 0.3386)
 
 
-        mesh = adv.mesh
-        nv, nx = adv.mesh.nv, adv.mesh.nx
+        adv1 = PSMAdvection(mesh)
+        adv2 = PSMAdvection(mesh)
+        nv, nx = mesh.nv, mesh.nx
         partial = zeros(ComplexF64, nx)
         fS3 = zeros(ComplexF64, nx)
         v1 = zeros(nx)
@@ -27,7 +29,7 @@ struct H3fhOperator
         u2 = zeros(nv, nx)
         f3 = zeros(ComplexF64, nx, nv)
 
-        new(adv, mesh, partial, fS3, v1, v2, u1, u2, f3, n_i, mub)
+        new(adv1, adv2, mesh, partial, fS3, v1, v2, u1, u2, f3, n_i, mub)
 
     end
 
@@ -38,23 +40,28 @@ $(SIGNATURES)
 """
 function step!(op::H3fhOperator, f0, f1, f2, f3, E2, A2, dt, h_int)
 
-    nx::Int = op.adv.mesh.nx
-    dv::Float64 = op.adv.mesh.dv
-    k::Vector{Float64} = op.adv.mesh.kx
+    nx::Int = op.mesh.nx
+    dv::Float64 = op.mesh.dv
+    k::Vector{Float64} = op.mesh.kx
 
     op.partial .= -k .^ 2 .* A2
     ifft!(op.partial)
     transpose!(op.f3, f3)
     fft!(op.f3, 1)
 
-    op.v1 .= h_int .* real(op.partial) ./ sqrt(3)
-    op.v2 .= -op.v1
+    @sync begin
+        @spawn begin
+            op.v1 .= h_int .* real(op.partial) ./ sqrt(3)
+            op.u1 .= 0.5 .* f0 .+ 0.5 .* sqrt(3) .* f3
+            advection!(op.u1, op.adv1, op.v1, dt)
+        end
 
-    op.u1 .= 0.5 .* f0 .+ 0.5 .* sqrt(3) .* f3
-    op.u2 .= 0.5 .* f0 .- 0.5 .* sqrt(3) .* f3
-
-    advection!(op.u1, op.adv, op.v1, dt)
-    advection!(op.u2, op.adv, op.v2, dt)
+        @spawn begin
+            op.v2 .= -h_int .* real(op.partial) ./ sqrt(3)
+            op.u2 .= 0.5 .* f0 .- 0.5 .* sqrt(3) .* f3
+            advection!(op.u2, op.adv2, op.v2, dt)
+        end
+    end
 
     op.partial .= 1im .* k .* A2
     ifft!(op.partial)
@@ -64,8 +71,8 @@ function step!(op::H3fhOperator, f0, f1, f2, f3, E2, A2, dt, h_int)
     op.u1 .= cos.(dt .* real(op.partial')) .* f1 .+ sin.(dt .* real(op.partial')) .* f2
     op.u2 .= -sin.(dt .* real(op.partial')) .* f1 .+ cos.(dt .* real(op.partial')) .* f2
 
-    f1 .= op.u1
-    f2 .= op.u2
+    copyto!(f1, op.u1)
+    copyto!(f2, op.u2)
 
     @inbounds for i = 2:nx
         E2[i] += dt * h_int * 1im * k[i] * sum(view(op.f3, i, :)) * dv
@@ -90,18 +97,25 @@ function step!(op::H3fhOperator, f0, f1, f2, f3, S1, S2, S3, dt, tiK)
     ifft!(op.partial)
 
     for i = 1:op.mesh.nx
-        op.v1[i] = - dt * real(op.partial[i]) * op.mub
-        op.v2[i] = - op.v1[i]
+        op.v1[i] = -dt * real(op.partial[i]) * op.mub
+        op.v2[i] = -op.v1[i]
     end
-
-    op.u1 .= 0.5 * f0 .+ 0.5 * f3
-    op.u2 .= 0.5 * f0 .- 0.5 * f3
-
-    advection!(op.u1, op.adv, op.v1, dt)
-    advection!(op.u2, op.adv, op.v2, dt)
 
     op.partial .= -(k .^ 2) .* op.fS3
     ifft!(op.partial)
+
+    @sync begin
+        @spawn begin
+            op.u1 .= 0.5 * f0 .+ 0.5 * f3
+            advection!(op.u1, op.adv1, op.v1, dt)
+        end
+
+        @spawn begin
+            op.u2 .= 0.5 * f0 .- 0.5 * f3
+            advection!(op.u2, op.adv2, op.v2, dt)
+        end
+    end
+
 
     # We use v1 and v2 for new values of S1 and S2 to save memory print
     for i = 1:op.mesh.nx
@@ -113,7 +127,7 @@ function step!(op::H3fhOperator, f0, f1, f2, f3, S1, S2, S3, dt, tiK)
     f0 .= op.u1 .+ op.u2
     f3 .= op.u1 .- op.u2
 
-    for i = eachindex(S3)
+    for i in eachindex(S3)
         B30 = -K_xc * op.n_i * 0.5 * S3[i]
         for j = 1:op.mesh.nv
             op.u1[j, i] = cos(dt * B30) * f1[j, i] - sin(dt * B30) .* f2[j, i]

@@ -4,16 +4,7 @@ using MAT
 using ProgressMeter
 using VectorSpin
 
-import VectorSpin: initialfunction
-import VectorSpin: initialfields
-import VectorSpin: diagnostics
-import VectorSpin: H2fh!
-import VectorSpin: He!
-import VectorSpin: HAA!
-import VectorSpin: H3fh!
-import VectorSpin: H1f!
-
-function operators()
+function vlasov_maxwell()
 
     T = 50 # 4000  # final time
     nx = 129  # partition of x
@@ -31,8 +22,6 @@ function operators()
     vth = 0.17
 
     mesh = Mesh(xmin, xmax, nx, vmin, vmax, nv)
-    #adv = BSplineAdvection(mesh)
-    adv = PSMAdvection(mesh)
 
     E1, E2, E3, A2, A3 = initialfields(mesh, a, ww, ke, k0)
     f0, f1, f2, f3 = initialfunction(mesh, a, ke, vth, ata)
@@ -47,23 +36,23 @@ function operators()
 
     data = Diagnostics(f0, f2, f3, E1, E2, E3, A2, A3, mesh, h_int)
 
-    H2fh = H2fhOperator(adv)
-    He = HeOperator(adv)
-    HAA = HAAOperator(adv)
-    H3fh = H3fhOperator(adv)
-    H1f = H1fOperator(adv)
+    H2fh = H2fhOperator(mesh)
+    He = HeOperator(mesh)
+    HAA = HAAOperator(mesh)
+    H3fh = H3fhOperator(mesh)
+    H1f = H1fOperator(mesh)
 
     @showprogress 1 for i = 1:nsteps # Loop over time
 
-        step!(f0, f1, f2, f3, E3, A3, H2fh, h / 2, h_int)
-        step!(f0, f1, f2, f3, E1, E2, E3, A2, A3, He, h / 2)
-        step!(f0, f1, f2, f3, E2, E3, A2, A3, HAA, h / 2)
-        step!(f0, f1, f2, f3, E2, A2, H3fh, h / 2, h_int)
-        step!(f0, f1, f2, f3, E1, H1f, h)
-        step!(f0, f1, f2, f3, E2, A2, H3fh, h / 2, h_int)
-        step!(f0, f1, f2, f3, E2, E3, A2, A3, HAA, h / 2)
-        step!(f0, f1, f2, f3, E1, E2, E3, A2, A3, He, h / 2)
-        step!(f0, f1, f2, f3, E3, A3, H2fh, h / 2, h_int)
+        step!(H2fh, f0, f1, f2, f3, E3, A3, h / 2, h_int)
+        step!(He, f0, f1, f2, f3, E1, E2, E3, A2, A3, h / 2)
+        step!(HAA, f0, f1, f2, f3, E2, E3, A2, A3, h / 2)
+        step!(H3fh, f0, f1, f2, f3, E2, A2, h / 2, h_int)
+        step!(H1f, f0, f1, f2, f3, E1, h)
+        step!(H3fh, f0, f1, f2, f3, E2, A2, h / 2, h_int)
+        step!(HAA, f0, f1, f2, f3, E2, E3, A2, A3, h / 2)
+        step!(He, f0, f1, f2, f3, E1, E2, E3, A2, A3, h / 2)
+        step!(H2fh, f0, f1, f2, f3, E3, A3, h / 2, h_int)
         save!(data, i * h, f0, f2, f3, E1, E2, E3, A2, A3)
 
     end
@@ -72,7 +61,7 @@ function operators()
 
 end
 
-results = operators()
+results = vlasov_maxwell()
 
 vars = matread(joinpath(@__DIR__, "sVMEata0p2.mat"))
 

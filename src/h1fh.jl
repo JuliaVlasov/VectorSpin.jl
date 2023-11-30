@@ -2,7 +2,8 @@ export H1fhOperator
 
 struct H1fhOperator
 
-    adv::AbstractAdvection
+    adv1::AbstractAdvection
+    adv2::AbstractAdvection
     mesh::Mesh
     fS1::Vector{ComplexF64}
     partial::Vector{ComplexF64}
@@ -13,9 +14,10 @@ struct H1fhOperator
     n_i::Float64
     mub::Float64
 
-    function H1fhOperator(adv; n_i = 1.0, mub = 0.3386)
+    function H1fhOperator(mesh; n_i = 1.0, mub = 0.3386)
 
-        mesh = adv.mesh
+        adv1 = PSMAdvection(mesh)
+        adv2 = PSMAdvection(mesh)
         fS1 = zeros(ComplexF64, mesh.nx)
         partial = zeros(ComplexF64, mesh.nx)
 
@@ -25,7 +27,7 @@ struct H1fhOperator
         u1 = zeros(mesh.nv, mesh.nx)
         u2 = zeros(mesh.nv, mesh.nx)
 
-        new(adv, mesh, fS1, partial, v1, v2, u1, u2, n_i, mub)
+        new(adv1, adv2, mesh, fS1, partial, v1, v2, u1, u2, n_i, mub)
 
     end
 
@@ -53,28 +55,33 @@ function step!(op::H1fhOperator, f0, f1, f2, f3, S1, S2, S3, dt, tiK)
     ifft!(op.partial)
 
     for i in eachindex(op.partial)
-        op.v1[i] = - real(op.partial[i]) * mub
+        op.v1[i] = -real(op.partial[i]) * mub
         op.v2[i] = -op.v1[i]
     end
 
-    op.u1 .= 0.5 .* f0 .+ 0.5 .* f1
-    op.u2 .= 0.5 .* f0 .- 0.5 .* f1
-
-    advection!(op.u1, op.adv, op.v1, dt)
-    advection!(op.u2, op.adv, op.v2, dt)
+    @sync begin
+        @spawn begin
+            op.u1 .= 0.5 .* f0 .+ 0.5 .* f1
+            advection!(op.u1, op.adv1, op.v1, dt)
+        end
+        @spawn begin
+            op.u2 .= 0.5 .* f0 .- 0.5 .* f1
+            advection!(op.u2, op.adv2, op.v2, dt)
+        end
+    end
 
     for i in eachindex(S1)
         B10 = -K_xc * n_i * 0.5 * S1[i]
-        for j in axes(f2,1)
-            f2[j,i] = cos(dt * B10) * f2[j,i] - sin(dt * B10) * f3[j,i]
-            f3[j,i] = sin(dt * B10) * f2[j,i] + cos(dt * B10) * f3[j,i]
+        for j in axes(f2, 1)
+            f2[j, i] = cos(dt * B10) * f2[j, i] - sin(dt * B10) * f3[j, i]
+            f3[j, i] = sin(dt * B10) * f2[j, i] + cos(dt * B10) * f3[j, i]
         end
     end
 
     op.partial .= -op.mesh.kx .^ 2 .* op.fS1
     ifft!(op.partial)
 
-    for i = eachindex(S3)
+    for i in eachindex(S3)
 
         temi = K_xc / 4 * sum(view(f1, :, i)) * op.mesh.dv + 0.01475 * real(op.partial[i])
 

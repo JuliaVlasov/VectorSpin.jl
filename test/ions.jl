@@ -85,12 +85,11 @@ using MAT
     vmin, vmax = -H, H
     nx, nv = M, N
     mesh = Mesh(xmin, xmax, nx, vmin, vmax, nv)
-    adv = PSMAdvection(mesh)
     Hv = HvOperator(mesh)
-    He = HeOperator(adv)
-    H1fh = H1fhOperator(adv)
-    H2fh = H2fhOperator(adv)
-    H3fh = H3fhOperator(adv)
+    He = HeOperator(mesh)
+    H1fh = H1fhOperator(mesh)
+    H2fh = H2fhOperator(mesh)
+    H3fh = H3fhOperator(mesh)
 
     # Lie splitting
     step!(Hv, f0, f1, f2, f3, E1, h )

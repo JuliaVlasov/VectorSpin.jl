@@ -2,22 +2,30 @@ export HAAOperator
 
 struct HAAOperator
 
-    adv::AbstractAdvection
+    mesh::Mesh
+    adv0::AbstractAdvection
+    adv1::AbstractAdvection
+    adv2::AbstractAdvection
+    adv3::AbstractAdvection
     A2::Vector{Float64}
     A3::Vector{Float64}
     dA2::Vector{ComplexF64}
     dA3::Vector{ComplexF64}
     delta::Vector{Float64}
 
-    function HAAOperator(adv)
+    function HAAOperator(mesh)
 
-        A2 = zeros(adv.mesh.nx)
-        A3 = zeros(adv.mesh.nx)
-        dA2 = zeros(ComplexF64, adv.mesh.nx)
-        dA3 = zeros(ComplexF64, adv.mesh.nx)
-        delta = zeros(adv.mesh.nx)
+        A2 = zeros(mesh.nx)
+        A3 = zeros(mesh.nx)
+        dA2 = zeros(ComplexF64, mesh.nx)
+        dA3 = zeros(ComplexF64, mesh.nx)
+        delta = zeros(mesh.nx)
+        adv0 = PSMAdvection(mesh)
+        adv1 = PSMAdvection(mesh)
+        adv2 = PSMAdvection(mesh)
+        adv3 = PSMAdvection(mesh)
 
-        new(adv, A2, A3, dA2, dA3, delta)
+        new(mesh, adv0, adv1, adv2, adv3, A2, A3, dA2, dA3, delta)
 
     end
 
@@ -36,9 +44,9 @@ $(SIGNATURES)
 """
 function step!(op::HAAOperator, f0, f1, f2, f3, E2, E3, A2, A3, dt)
 
-    nx::Int = op.adv.mesh.nx
-    kx::Vector{Float64} = op.adv.mesh.kx
-    dv::Float64 = op.adv.mesh.dv
+    nx::Int = op.mesh.nx
+    kx::Vector{Float64} = op.mesh.kx
+    dv::Float64 = op.mesh.dv
 
     op.dA2 .= 1im .* kx .* A2
     ifft!(op.dA2)
@@ -63,9 +71,11 @@ function step!(op::HAAOperator, f0, f1, f2, f3, E2, E3, A2, A3, dt)
     E2 .+= dt * fft(op.A2)
     E3 .+= dt * fft(op.A3)
 
-    advection!(f0, op.adv, op.delta, dt)
-    advection!(f1, op.adv, op.delta, dt)
-    advection!(f2, op.adv, op.delta, dt)
-    advection!(f3, op.adv, op.delta, dt)
+    @sync begin
+        @spawn advection!(f0, op.adv0, op.delta, dt)
+        @spawn advection!(f1, op.adv1, op.delta, dt)
+        @spawn advection!(f2, op.adv2, op.delta, dt)
+        @spawn advection!(f3, op.adv3, op.delta, dt)
+    end
 
 end

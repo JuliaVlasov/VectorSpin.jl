@@ -2,6 +2,7 @@ module VectorSpin
 
 using DocStringExtensions
 using FFTW
+using .Threads
 
 include("mesh.jl")
 include("initialfields.jl")

@@ -11,7 +11,7 @@ struct HvOperator
     ff1::Matrix{ComplexF64}
     ff2::Matrix{ComplexF64}
     ff3::Matrix{ComplexF64}
-    expv:: Matrix{ComplexF64}
+    expv::Matrix{ComplexF64}
 
     function HvOperator(mesh)
 
@@ -51,7 +51,7 @@ function step!(op::HvOperator, f0, f1, f2, f3, E1, dt)
         @spawn begin
             transpose!(op.ff0, f0)
             fft!(op.ff0, 1)
-            op.ff0 .*= op.expv .^dt
+            op.ff0 .*= op.expv .^ dt
             E1 .= vec(sum(op.ff0, dims = 2))
             E1[1] = 0.0
 
@@ -66,7 +66,7 @@ function step!(op::HvOperator, f0, f1, f2, f3, E1, dt)
         @spawn begin
             transpose!(op.ff1, f1)
             fft!(op.ff1, 1)
-            op.ff1 .*= op.expv .^dt
+            op.ff1 .*= op.expv .^ dt
             ifft!(op.ff1, 1)
             transpose!(f1, real(op.ff1))
         end
@@ -74,7 +74,7 @@ function step!(op::HvOperator, f0, f1, f2, f3, E1, dt)
         @spawn begin
             transpose!(op.ff2, f2)
             fft!(op.ff2, 1)
-            op.ff2 .*= op.expv .^dt
+            op.ff2 .*= op.expv .^ dt
             ifft!(op.ff2, 1)
             transpose!(f2, real(op.ff2))
         end
@@ -82,7 +82,7 @@ function step!(op::HvOperator, f0, f1, f2, f3, E1, dt)
         @spawn begin
             transpose!(op.ff3, f3)
             fft!(op.ff3, 1)
-            op.ff3 .*= op.expv .^dt
+            op.ff3 .*= op.expv .^ dt
             ifft!(op.ff3, 1)
             transpose!(f3, real(op.ff3))
         end

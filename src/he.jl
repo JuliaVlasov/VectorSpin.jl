@@ -10,13 +10,13 @@ struct HeOperator
     adv3::AbstractAdvection
     e::Vector{Float64}
 
-    function HeOperator(adv)
+    function HeOperator(mesh)
 
-        e = zeros(adv.mesh.nx)
-        adv0 = PSMAdvection(adv.mesh)
-        adv1 = PSMAdvection(adv.mesh)
-        adv2 = PSMAdvection(adv.mesh)
-        adv3 = PSMAdvection(adv.mesh)
+        e = zeros(mesh.nx)
+        adv0 = PSMAdvection(mesh)
+        adv1 = PSMAdvection(mesh)
+        adv2 = PSMAdvection(mesh)
+        adv3 = PSMAdvection(mesh)
 
         new(adv0, adv1, adv2, adv3, e)
 
@@ -43,10 +43,10 @@ function step!(op::HeOperator, f0, f1, f2, f3, E1, E2, E3, A2, A3, dt)
     op.e .= real(ifft(E1))
 
     @sync begin
-       @spawn advection!(f0, op.adv0, op.e, dt)
-       @spawn advection!(f1, op.adv1, op.e, dt)
-       @spawn advection!(f2, op.adv2, op.e, dt)
-       @spawn advection!(f3, op.adv3, op.e, dt)
+        @spawn advection!(f0, op.adv0, op.e, dt)
+        @spawn advection!(f1, op.adv1, op.e, dt)
+        @spawn advection!(f2, op.adv2, op.e, dt)
+        @spawn advection!(f3, op.adv3, op.e, dt)
     end
 
 end

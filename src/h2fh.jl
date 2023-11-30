@@ -2,7 +2,8 @@ export H2fhOperator
 
 struct H2fhOperator
 
-    adv::AbstractAdvection
+    adv1::AbstractAdvection
+    adv2::AbstractAdvection
     mesh::Mesh
     partial::Vector{ComplexF64}
     fS2::Vector{ComplexF64}
@@ -14,9 +15,10 @@ struct H2fhOperator
     n_i::Float64
     mub::Float64
 
-    function H2fhOperator(adv; n_i = 1.0, mub = 0.3386)
+    function H2fhOperator(mesh; n_i = 1.0, mub = 0.3386)
 
-        mesh = adv.mesh
+        adv1 = PSMAdvection(mesh)
+        adv2 = PSMAdvection(mesh)
         partial = zeros(ComplexF64, mesh.nx)
         fS2 = zeros(ComplexF64, mesh.nx)
         v1 = zeros(mesh.nx)
@@ -25,7 +27,7 @@ struct H2fhOperator
         u2 = zeros(mesh.nv, mesh.nx)
         f2 = zeros(ComplexF64, mesh.nx, mesh.nv)
 
-        new(adv, mesh, partial, fS2, v1, v2, u1, u2, f2, n_i, mub)
+        new(adv1, adv2, mesh, partial, fS2, v1, v2, u1, u2, f2, n_i, mub)
 
     end
 
@@ -51,11 +53,19 @@ function step!(op::H2fhOperator, f0, f1, f2, f3, E3, A3, dt, h_int)
     op.v1 .= -h_int .* real(op.partial) ./ sqrt(3)
     op.v2 .= -op.v1
 
-    op.u1 .= 0.5 * f0 .+ 0.5 * sqrt(3) .* f2
-    op.u2 .= 0.5 * f0 .- 0.5 * sqrt(3) .* f2
+    @sync begin
 
-    advection!(op.u1, op.adv, op.v1, dt)
-    advection!(op.u2, op.adv, op.v2, dt)
+        @spawn begin
+            op.u1 .= 0.5 * f0 .+ 0.5 * sqrt(3) .* f2
+            advection!(op.u1, op.adv1, op.v1, dt)
+        end
+
+        @spawn begin
+            op.u2 .= 0.5 * f0 .- 0.5 * sqrt(3) .* f2
+            advection!(op.u2, op.adv2, op.v2, dt)
+        end
+
+    end
 
     transpose!(op.f2, f2)
 
@@ -70,8 +80,8 @@ function step!(op::H2fhOperator, f0, f1, f2, f3, E3, A3, dt, h_int)
     fft!(op.f2, 1)
     E3 .-= dt .* h_int .* (1im .* kx) .* vec(sum(op.f2, dims = 2)) .* dv
 
-    f1 .= op.u1
-    f3 .= op.u2
+    copyto!(f1, op.u1)
+    copyto!(f3, op.u2)
 
 end
 
@@ -94,9 +104,9 @@ function step!(op::H2fhOperator, f0, f1, f2, f3, S1, S2, S3, dt, tiK)
 
     for i in eachindex(S2)
         B20 = -K_xc * op.n_i * 0.5 * S2[i]
-        for j in 1:op.mesh.nv
-            f1[j,i] = cos(dt * B20) * op.u1[j,i] + sin(dt * B20) * op.u2[j,i]
-            f3[j,i] = -sin(dt * B20) * op.u1[j,i] + cos(dt * B20) * op.u2[j,i]
+        for j = 1:op.mesh.nv
+            f1[j, i] = cos(dt * B20) * op.u1[j, i] + sin(dt * B20) * op.u2[j, i]
+            f3[j, i] = -sin(dt * B20) * op.u1[j, i] + cos(dt * B20) * op.u2[j, i]
         end
     end
 
@@ -113,11 +123,19 @@ function step!(op::H2fhOperator, f0, f1, f2, f3, S1, S2, S3, dt, tiK)
     op.partial .= -op.mesh.kx .^ 2 .* op.fS2
     ifft!(op.partial)
 
-    op.u1 .= 0.5 .* f0 .+ 0.5 .* f2
-    op.u2 .= 0.5 .* f0 .- 0.5 .* f2
+    @sync begin
 
-    advection!(op.u1, op.adv, op.v1, dt)
-    advection!(op.u2, op.adv, op.v2, dt)
+        @spawn begin
+            op.u1 .= 0.5 .* f0 .+ 0.5 .* f2
+            advection!(op.u1, op.adv1, op.v1, dt)
+        end
+
+        @spawn begin
+            op.u2 .= 0.5 .* f0 .- 0.5 .* f2
+            advection!(op.u2, op.adv2, op.v2, dt)
+        end
+
+    end
 
     # v1 and v2 are used vor new values of S1 and S2 to reduce memeory print
     for i = 1:op.mesh.nx

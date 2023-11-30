@@ -39,11 +39,11 @@ const kk = 0.17 # v_th
     @test f2 ≈ df["f2"]
     @test f3 ≈ df["f3"]
 
-    H2fh = H2fhOperator(adv)
-    He = HeOperator(adv)
-    HAA = HAAOperator(adv)
-    H3fh = H3fhOperator(adv)
-    H1f = H1fOperator(adv)
+    H2fh = H2fhOperator(mesh)
+    He = HeOperator(mesh)
+    HAA = HAAOperator(mesh)
+    H3fh = H3fhOperator(mesh)
+    H1f = H1fOperator(mesh)
 
     step!(H2fh, f0, f1, f2, f3, E3, A3, h / 2, h_int)
 
