@@ -6,7 +6,6 @@ DocMeta.setdocmeta!(VectorSpin, :DocTestSetup, :(using VectorSpin); recursive=tr
 makedocs(;
     modules=[VectorSpin],
     authors="Julia Vlasov",
-    repo="https://github.com/JuliaVlasov/VectorSpin.jl/blob/{commit}{path}#{line}",
     sitename="VectorSpin.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",

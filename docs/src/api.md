@@ -1,10 +1,4 @@
-```@meta
-CurrentModule = VectorSpin
-```
-
-# VectorSpin
-
-Documentation for [VectorSpin](https://github.com/JuliaVlasov/VectorSpin.jl).
+# VectorSpin types and functions
 
 ```@index
 ```

@@ -1,7 +1,3 @@
-```@meta
-CurrentModule = VectorSpin
-```
-
 # VectorSpin
 
 ## Scalar spin laser plasma model

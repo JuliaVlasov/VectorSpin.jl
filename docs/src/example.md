@@ -24,18 +24,17 @@ function run()
     vth = 0.17
 
     mesh = Mesh(xmin, xmax, nx, vmin, vmax, nv)
-    adv  = PSMAdvection(mesh)
     
     E1, E2, E3, A2, A3 = initialfields( mesh, a, ww, ke, k0)
     f0, f1, f2, f3 = initialfunction(mesh, a, ke, vth,  ata)
 
     results = Diagnostics(f0, f2, f3, E1, E2, E3, A2, A3, mesh, h_int)
 
-    H2fh = H2fhOperator(adv)
-    He = HeOperator(adv)
-    HAA = HAAOperator(adv)
-    H3fh = H3fhOperator(adv)
-    H1f = H1fOperator(adv)
+    H2fh = H2fhOperator(mesh)
+    He = HeOperator(mesh)
+    HAA = HAAOperator(mesh)
+    H3fh = H3fhOperator(mesh)
+    H1f = H1fOperator(mesh)
 
     for i = 1:nsteps # Loop over time
 
