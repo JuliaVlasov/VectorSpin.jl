@@ -12,6 +12,7 @@ MAT = "23992714-dd62-5051-b70f-ba57cb901cac"
 SemiLagrangian = "abe12ce6-d865-11e8-314f-3f926d5bd47d"
 
 [compat]
+DispersionRelations = "1"
 DocStringExtensions = "0.9"
 FFTW = "1"
 MAT = "0.10"
