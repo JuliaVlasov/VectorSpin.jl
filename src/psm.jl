@@ -2,33 +2,31 @@ import LinearAlgebra: SymTridiagonal
 
 export PSMAdvection
 
-struct PSM end
+struct PSMAdvection{T} <: AbstractAdvection
 
-struct PSMAdvection <: AbstractAdvection
+    mesh::Mesh{T}
+    a::Vector{T}
+    b::Vector{T}
+    c::Vector{T}
+    d::Vector{T}
+    diag::Vector{T}
+    dsup::Vector{T}
+    A::SymTridiagonal{T,Vector{T}}
 
-    mesh::Mesh
-    a::Vector{Float64}
-    b::Vector{Float64}
-    c::Vector{Float64}
-    d::Vector{Float64}
-    diag::Vector{Float64}
-    dsup::Vector{Float64}
-    A::SymTridiagonal{Float64,Vector{Float64}}
+    function PSMAdvection(mesh::Mesh{T}) where {T}
 
-    function PSMAdvection(mesh::Mesh)
+        a = zeros(T, mesh.nv)
+        b = zeros(T, mesh.nv)
+        c = zeros(T, mesh.nv + 1)
+        d = zeros(T, mesh.nv)
 
-        a = zeros(mesh.nv)
-        b = zeros(mesh.nv)
-        c = zeros(mesh.nv + 1)
-        d = zeros(mesh.nv)
-
-        diag = fill(4 / 3, mesh.nv + 1)
+        diag = 4 / 3 .* ones(T, mesh.nv + 1)
         diag[begin] = 2 / 3
         diag[end] = 2 / 3
-        dsup = 1 / 3 .* ones(mesh.nv)
-        A = SymTridiagonal(diag, dsup)
+        dsup = 1 / 3 .* ones(T, mesh.nv)
+        A = SymTridiagonal{T, Vector{T}}(diag, dsup)
 
-        new(mesh, a, b, c, d, diag, dsup, A)
+        new{T}(mesh, a, b, c, d, diag, dsup, A)
 
     end
 
@@ -63,11 +61,11 @@ Here we need to reconstruct a polynomial function ``f(x_j,p,0)`` using the
 averages ``f_{j,l}(0)`` using the PSM approach. 
 
 """
-function advection!(df, adv::PSMAdvection, v, dt)
+function advection!(df, adv::PSMAdvection{T}, v, dt) where {T}
 
     nx::Int = adv.mesh.nx
     nv::Int = adv.mesh.nv
-    dv::Float64 = adv.mesh.dv
+    dv::T = adv.mesh.dv
 
     @inbounds for j in eachindex(v)
 
