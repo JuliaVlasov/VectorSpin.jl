@@ -1,6 +1,5 @@
 using .Threads
-
-export Hv!
+import LinearAlgebra: transpose!
 
 export HvOperator
 

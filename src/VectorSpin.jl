@@ -11,7 +11,6 @@ include("diagnostics.jl")
 
 abstract type AbstractAdvection end
 
-include("translation.jl")
 include("psm.jl")
 include("bspline.jl")
 

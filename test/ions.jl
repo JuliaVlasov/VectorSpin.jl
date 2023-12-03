@@ -1,5 +1,6 @@
 using FFTW
 using MAT
+using VectorSpin
 
 @testset "Spin Ions" begin
 

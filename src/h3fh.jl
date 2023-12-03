@@ -79,8 +79,6 @@ function step!(op::H3fhOperator, f0, f1, f2, f3, E2, A2, dt, h_int)
     end
 end
 
-export H3fh!
-
 """
 $(SIGNATURES)
 

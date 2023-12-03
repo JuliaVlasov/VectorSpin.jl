@@ -33,8 +33,6 @@ struct H1fhOperator
 
 end
 
-export H1fh!
-
 """
 $(SIGNATURES)
 

@@ -33,7 +33,6 @@ struct H2fhOperator
 
 end
 
-
 export step!
 
 """
@@ -84,10 +83,6 @@ function step!(op::H2fhOperator, f0, f1, f2, f3, E3, A3, dt, h_int)
     copyto!(f3, op.u2)
 
 end
-
-
-export H2fh!
-
 
 """
 $(SIGNATURES)

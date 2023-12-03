@@ -1,3 +1,5 @@
+import LinearAlgebra: SymTridiagonal
+
 export PSMAdvection
 
 struct PSM end
