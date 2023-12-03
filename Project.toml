@@ -9,11 +9,8 @@ FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [compat]
-<<<<<<< HEAD
 DispersionRelations = "1"
-=======
 Aqua = "0.8"
->>>>>>> bd7a150 (Fix issues found by Aqua.jl)
 DocStringExtensions = "0.9"
 FFTW = "1"
 LinearAlgebra = "1"
