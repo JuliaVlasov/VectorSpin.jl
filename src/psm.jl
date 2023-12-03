@@ -24,7 +24,7 @@ struct PSMAdvection{T} <: AbstractAdvection
         diag[begin] = 2 / 3
         diag[end] = 2 / 3
         dsup = 1 / 3 .* ones(T, mesh.nv)
-        A = SymTridiagonal{T, Vector{T}}(diag, dsup)
+        A = SymTridiagonal{T,Vector{T}}(diag, dsup)
 
         new{T}(mesh, a, b, c, d, diag, dsup, A)
 

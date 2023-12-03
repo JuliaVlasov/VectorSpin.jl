@@ -19,7 +19,7 @@ B_{i,p}(x) := \\frac{x - t_i}{t_{i+p} - t_i} B_{i,p-1}(x)
 + \\frac{t_{i+p+1} - x}{t_{i+p+1} - t_{i+1}} B_{i+1,p-1}(x).
 ```
 """
-function bspline(p::Int, j::Int, x::Float64)
+function bspline(p, j, x)
     if p == 0
         j == 0 ? (return 1.0) : (return 0.0)
     else
@@ -37,38 +37,38 @@ Advection to be computed on each row
 $(TYPEDFIELDS)
 
 """
-struct BSplineAdvection <: AbstractAdvection
+struct BSplineAdvection{T} <: AbstractAdvection
 
-    mesh::Mesh
+    mesh::Mesh{T}
     dims::Symbol
     p::Int64
-    step::Float64
-    modes::Vector{Float64}
-    eig_bspl::Vector{Float64}
-    eigalpha::Vector{Complex{Float64}}
-    fhat::Matrix{ComplexF64}
+    step::T
+    modes::Vector{T}
+    eig_bspl::Vector{T}
+    eigalpha::Vector{Complex{T}}
+    fhat::Matrix{Complex{T}}
 
-    function BSplineAdvection(mesh::Mesh; p = 3, dims = :v)
+    function BSplineAdvection(mesh::Mesh{T}; p = 3, dims = :v) where {T}
 
         if dims == :v
             n = mesh.nv
             step = mesh.dv
-            fhat = zeros(ComplexF64, mesh.nv, mesh.nx)
+            fhat = zeros(Complex{T}, mesh.nv, mesh.nx)
         else
             n = mesh.nx
             step = mesh.dx
-            fhat = zeros(ComplexF64, mesh.nx, mesh.nv)
+            fhat = zeros(Complex{T}, mesh.nx, mesh.nv)
         end
 
-        modes = zeros(Float64, n)
+        modes = zeros(T, n)
         modes .= [2π * i / n for i = 0:n-1]
-        eig_bspl = zeros(Float64, n)
+        eig_bspl = zeros(T, n)
         eig_bspl .= bspline(p, -div(p + 1, 2), 0.0)
         for i = 1:div(p + 1, 2)-1
             eig_bspl .+= bspline(p, i - (p + 1) ÷ 2, 0.0) * 2 .* cos.(i * modes)
         end
-        eigalpha = zeros(Complex{Float64}, n)
-        new(mesh, dims, p, step, modes, eig_bspl, eigalpha, fhat)
+        eigalpha = zeros(Complex{T}, n)
+        new{T}(mesh, dims, p, step, modes, eig_bspl, eigalpha, fhat)
     end
 
 end

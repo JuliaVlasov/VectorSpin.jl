@@ -1,33 +1,33 @@
 export H2fhOperator
 
-struct H2fhOperator
+struct H2fhOperator{T}
 
     adv1::AbstractAdvection
     adv2::AbstractAdvection
-    mesh::Mesh
-    partial::Vector{ComplexF64}
-    fS2::Vector{ComplexF64}
-    v1::Vector{Float64}
-    v2::Vector{Float64}
-    u1::Matrix{Float64}
-    u2::Matrix{Float64}
-    f2::Matrix{ComplexF64}
-    n_i::Float64
-    mub::Float64
+    mesh::Mesh{T}
+    partial::Vector{Complex{T}}
+    fS2::Vector{Complex{T}}
+    v1::Vector{T}
+    v2::Vector{T}
+    u1::Matrix{T}
+    u2::Matrix{T}
+    f2::Matrix{Complex{T}}
+    n_i::T
+    mub::T
 
-    function H2fhOperator(mesh; n_i = 1.0, mub = 0.3386)
+    function H2fhOperator(mesh::Mesh{T}; n_i = 1.0, mub = 0.3386) where {T}
 
         adv1 = PSMAdvection(mesh)
         adv2 = PSMAdvection(mesh)
-        partial = zeros(ComplexF64, mesh.nx)
-        fS2 = zeros(ComplexF64, mesh.nx)
-        v1 = zeros(mesh.nx)
-        v2 = zeros(mesh.nx)
-        u1 = zeros(mesh.nv, mesh.nx)
-        u2 = zeros(mesh.nv, mesh.nx)
-        f2 = zeros(ComplexF64, mesh.nx, mesh.nv)
+        partial = zeros(Complex{T}, mesh.nx)
+        fS2 = zeros(Complex{T}, mesh.nx)
+        v1 = zeros(T, mesh.nx)
+        v2 = zeros(T, mesh.nx)
+        u1 = zeros(T, mesh.nv, mesh.nx)
+        u2 = zeros(T, mesh.nv, mesh.nx)
+        f2 = zeros(Complex{T}, mesh.nx, mesh.nv)
 
-        new(adv1, adv2, mesh, partial, fS2, v1, v2, u1, u2, f2, n_i, mub)
+        new{T}(adv1, adv2, mesh, partial, fS2, v1, v2, u1, u2, f2, n_i, mub)
 
     end
 
@@ -41,10 +41,20 @@ compute the subsystem H2
 $(SIGNATURES)
 
 """
-function step!(op::H2fhOperator, f0, f1, f2, f3, E3, A3, dt, h_int)
+function step!(
+    op::H2fhOperator{T},
+    f0::Matrix{T},
+    f1::Matrix{T},
+    f2::Matrix{T},
+    f3::Matrix{T},
+    E3::Vector{Complex{T}},
+    A3::Vector{Complex{T}},
+    dt::T,
+    h_int,
+) where {T}
 
-    kx::Vector{Float64} = op.mesh.kx
-    dv::Float64 = op.mesh.dv
+    kx = op.mesh.kx
+    dv = op.mesh.dv
 
     op.partial .= -kx .^ 2 .* A3
     ifft!(op.partial)
@@ -90,7 +100,18 @@ $(SIGNATURES)
 compute the subsystem Hs2
 
 """
-function step!(op::H2fhOperator, f0, f1, f2, f3, S1, S2, S3, dt, tiK)
+function step!(
+    op::H2fhOperator{T},
+    f0::Matrix{T},
+    f1::Matrix{T},
+    f2::Matrix{T},
+    f3::Matrix{T},
+    S1::Vector{T},
+    S2::Vector{T},
+    S3::Vector{T},
+    dt::T,
+    tiK,
+) where {T}
 
     K_xc = tiK
 

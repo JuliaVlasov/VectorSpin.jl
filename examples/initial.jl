@@ -1,13 +1,27 @@
 import Pkg
-Pkg.add(["DispersionRelations", "ProgressMeter", "TimerOutputs"])
 
 using FFTW
-using Plots
-using ProgressMeter
-using TimerOutputs
-using VectorSpin
 
-using DispersionRelations
+try
+    using Plots
+catch
+    Pkg.add("Plots")
+    using Plots
+end
+try
+    using ProgressMeter
+catch
+    Pkg.add("ProgressMeter")
+    using ProgressMeter
+end
+try
+    using TimerOutputs
+catch
+    Pkg.add("TimerOutputs")
+    using TimerOutputs
+end
+
+using VectorSpin
 
 const to = TimerOutput()
 

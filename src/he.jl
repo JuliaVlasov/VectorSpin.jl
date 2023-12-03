@@ -2,23 +2,23 @@ using .Threads
 
 export HeOperator
 
-struct HeOperator
+struct HeOperator{T}
 
     adv0::AbstractAdvection
     adv1::AbstractAdvection
     adv2::AbstractAdvection
     adv3::AbstractAdvection
-    e::Vector{Float64}
+    e::Vector{T}
 
-    function HeOperator(mesh)
+    function HeOperator(mesh::Mesh{T}) where {T}
 
-        e = zeros(mesh.nx)
+        e = zeros(T, mesh.nx)
         adv0 = PSMAdvection(mesh)
         adv1 = PSMAdvection(mesh)
         adv2 = PSMAdvection(mesh)
         adv3 = PSMAdvection(mesh)
 
-        new(adv0, adv1, adv2, adv3, e)
+        new{T}(adv0, adv1, adv2, adv3, e)
 
     end
 
@@ -35,7 +35,19 @@ f_t - Ef_v = 0
 ```
 
 """
-function step!(op::HeOperator, f0, f1, f2, f3, E1, E2, E3, A2, A3, dt)
+function step!(
+    op::HeOperator{T},
+    f0::Matrix{T},
+    f1::Matrix{T},
+    f2::Matrix{T},
+    f3::Matrix{T},
+    E1::Vector{Complex{T}},
+    E2::Vector{Complex{T}},
+    E3::Vector{Complex{T}},
+    A2::Vector{Complex{T}},
+    A3::Vector{Complex{T}},
+    dt::T,
+) where {T}
 
     A2 .-= dt .* E2
     A3 .-= dt .* E3
@@ -52,7 +64,15 @@ function step!(op::HeOperator, f0, f1, f2, f3, E1, E2, E3, A2, A3, dt)
 end
 
 
-function step!(op::HeOperator, f0, f1, f2, f3, E1, dt)
+function step!(
+    op::HeOperator{T},
+    f0::Matrix{T},
+    f1::Matrix{T},
+    f2::Matrix{T},
+    f3::Matrix{T},
+    E1::Vector{Complex{T}},
+    dt::T,
+) where {T}
 
     op.e .= -real(ifft(E1))
 

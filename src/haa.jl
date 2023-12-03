@@ -1,31 +1,31 @@
 export HAAOperator
 
-struct HAAOperator
+struct HAAOperator{T}
 
-    mesh::Mesh
+    mesh::Mesh{T}
     adv0::AbstractAdvection
     adv1::AbstractAdvection
     adv2::AbstractAdvection
     adv3::AbstractAdvection
-    A2::Vector{Float64}
-    A3::Vector{Float64}
-    dA2::Vector{ComplexF64}
-    dA3::Vector{ComplexF64}
-    delta::Vector{Float64}
+    A2::Vector{T}
+    A3::Vector{T}
+    dA2::Vector{Complex{T}}
+    dA3::Vector{Complex{T}}
+    delta::Vector{T}
 
-    function HAAOperator(mesh)
+    function HAAOperator(mesh::Mesh{T}) where {T}
 
-        A2 = zeros(mesh.nx)
-        A3 = zeros(mesh.nx)
-        dA2 = zeros(ComplexF64, mesh.nx)
-        dA3 = zeros(ComplexF64, mesh.nx)
-        delta = zeros(mesh.nx)
+        A2 = zeros(T, mesh.nx)
+        A3 = zeros(T, mesh.nx)
+        dA2 = zeros(Complex{T}, mesh.nx)
+        dA3 = zeros(Complex{T}, mesh.nx)
+        delta = zeros(T, mesh.nx)
         adv0 = PSMAdvection(mesh)
         adv1 = PSMAdvection(mesh)
         adv2 = PSMAdvection(mesh)
         adv3 = PSMAdvection(mesh)
 
-        new(mesh, adv0, adv1, adv2, adv3, A2, A3, dA2, dA3, delta)
+        new{T}(mesh, adv0, adv1, adv2, adv3, A2, A3, dA2, dA3, delta)
 
     end
 
@@ -42,11 +42,22 @@ $(SIGNATURES)
 \\end{aligned}
 ```
 """
-function step!(op::HAAOperator, f0, f1, f2, f3, E2, E3, A2, A3, dt)
+function step!(
+    op::HAAOperator{T},
+    f0::Matrix{T},
+    f1::Matrix{T},
+    f2::Matrix{T},
+    f3::Matrix{T},
+    E2::Vector{Complex{T}},
+    E3::Vector{Complex{T}},
+    A2::Vector{Complex{T}},
+    A3::Vector{Complex{T}},
+    dt::T,
+) where {T}
 
-    nx::Int = op.mesh.nx
-    kx::Vector{Float64} = op.mesh.kx
-    dv::Float64 = op.mesh.dv
+    nx = op.mesh.nx
+    kx = op.mesh.kx
+    dv = op.mesh.dv
 
     op.dA2 .= 1im .* kx .* A2
     ifft!(op.dA2)
@@ -63,7 +74,7 @@ function step!(op::HAAOperator, f0, f1, f2, f3, E2, E3, A2, A3, dt)
     end
 
     @inbounds for i = 1:nx
-        s::Float64 = sum(view(f0, :, i))
+        s = sum(view(f0, :, i))
         op.A2[i] = dv * op.A2[i] * s
         op.A3[i] = dv * op.A3[i] * s
     end

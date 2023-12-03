@@ -1,33 +1,33 @@
 export H1fhOperator
 
-struct H1fhOperator
+struct H1fhOperator{T}
 
     adv1::AbstractAdvection
     adv2::AbstractAdvection
-    mesh::Mesh
-    fS1::Vector{ComplexF64}
-    partial::Vector{ComplexF64}
-    v1::Vector{Float64}
-    v2::Vector{Float64}
-    u1::Matrix{Float64}
-    u2::Matrix{Float64}
-    n_i::Float64
-    mub::Float64
+    mesh::Mesh{T}
+    fS1::Vector{Complex{T}}
+    partial::Vector{Complex{T}}
+    v1::Vector{T}
+    v2::Vector{T}
+    u1::Matrix{T}
+    u2::Matrix{T}
+    n_i::T
+    mub::T
 
-    function H1fhOperator(mesh; n_i = 1.0, mub = 0.3386)
+    function H1fhOperator(mesh::Mesh{T}; n_i = 1.0, mub = 0.3386) where {T}
 
         adv1 = PSMAdvection(mesh)
         adv2 = PSMAdvection(mesh)
-        fS1 = zeros(ComplexF64, mesh.nx)
-        partial = zeros(ComplexF64, mesh.nx)
+        fS1 = zeros(Complex{T}, mesh.nx)
+        partial = zeros(Complex{T}, mesh.nx)
 
-        v1 = zeros(mesh.nx)
-        v2 = zeros(mesh.nx)
+        v1 = zeros(T, mesh.nx)
+        v2 = zeros(T, mesh.nx)
 
-        u1 = zeros(mesh.nv, mesh.nx)
-        u2 = zeros(mesh.nv, mesh.nx)
+        u1 = zeros(T, mesh.nv, mesh.nx)
+        u2 = zeros(T, mesh.nv, mesh.nx)
 
-        new(adv1, adv2, mesh, fS1, partial, v1, v2, u1, u2, n_i, mub)
+        new{T}(adv1, adv2, mesh, fS1, partial, v1, v2, u1, u2, n_i, mub)
 
     end
 
@@ -40,7 +40,18 @@ compute the subsystem Hs1
 M is even number
 
 """
-function step!(op::H1fhOperator, f0, f1, f2, f3, S1, S2, S3, dt, tiK)
+function step!(
+    op::H1fhOperator{T},
+    f0::Matrix{T},
+    f1::Matrix{T},
+    f2::Matrix{T},
+    f3::Matrix{T},
+    S1::Vector{T},
+    S2::Vector{T},
+    S3::Vector{T},
+    dt::T,
+    tiK,
+) where {T}
 
     K_xc = tiK
     n_i = op.n_i

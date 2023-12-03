@@ -5,7 +5,7 @@ using VectorSpin
 @testset "Spin Ions" begin
 
     sol = matread("onestep.mat")
-    
+
     T = 5000 # final simulation time
     M = 119 # mesh number in x direction
     N = 129 # mesh number in v direction
@@ -17,11 +17,11 @@ using VectorSpin
     nsteps = 1 # floor(Int, T / h + 1.1) # time step number
     x = (0:(M-1)) .* L / M # mesh in x
     v1 = (1:N) * 2 * H / N .- H # mesh in v
-    
+
     a = 0.001 # perturbation for f
     E1 = fft(-1.0 * a / kkk * sin.(kkk * x)) # electric field
     epsil = a # perturbation for S
-    
+
     # spin variables
     S1 = zeros(M)
     S2 = zeros(M)
@@ -29,7 +29,7 @@ using VectorSpin
     dS1 = zeros(M)
     dS2 = zeros(M)
     dS3 = zeros(M)
-    
+
     for k = 1:M
         normx = sqrt(1 + epsil^2) #    norm of S
         dS1[k] = epsil * cos(kkk * x[k]) / normx
@@ -39,11 +39,11 @@ using VectorSpin
         S2[k] = dS2[k]
         S3[k] = 1.0 / normx
     end
-    
+
     @test sol["S1value"][:, 1] ≈ S1
     @test sol["S2value"][:, 1] ≈ S2
     @test sol["S3value"][:, 1] ≈ S3
-    
+
     v1node = zeros(5N)
     for i = 1:N
         v1node[5i-4] = v1[i] - 2H / N
@@ -52,7 +52,7 @@ using VectorSpin
         v1node[5i-1] = v1[i] - (2H / N) * 1 / 4
         v1node[5i] = v1[i]
     end
-    
+
     f0_node = zeros(5N, M)
     df0_node = zeros(5N, M)
     f1_node = zeros(5N, M)
@@ -61,16 +61,14 @@ using VectorSpin
     df3_node = zeros(5N, M)
     femi1 = 1
     femi2 = -1
-    
+
     for k = 1:M, i = 1:5N
-        f0_node[i, k], df0_node[i, k] =
-            init(k, x, i, v1node, kkk, a, femi1, tildeK)
+        f0_node[i, k], df0_node[i, k] = init(k, x, i, v1node, kkk, a, femi1, tildeK)
         f1_node[i, k] = 0.0
         f2_node[i, k] = 0.0
-        f3_node[i, k], df3_node[i, k] =
-            init(k, x, i, v1node, kkk, a, femi2, tildeK)
+        f3_node[i, k], df3_node[i, k] = init(k, x, i, v1node, kkk, a, femi2, tildeK)
     end
-    
+
     f0 = zeros(N, M)
     f1 = zeros(N, M)
     f2 = zeros(N, M)
@@ -81,7 +79,7 @@ using VectorSpin
         f2[:, k] .= integrate(f2_node[:, k], N)
         f3[:, k] .= integrate(f3_node[:, k], N)
     end
-    
+
     xmin, xmax = 0.0, L
     vmin, vmax = -H, H
     nx, nv = M, N
@@ -93,60 +91,60 @@ using VectorSpin
     H3fh = H3fhOperator(mesh)
 
     # Lie splitting
-    step!(Hv, f0, f1, f2, f3, E1, h )
-    
+    step!(Hv, f0, f1, f2, f3, E1, h)
+
     hv = matread("hv.mat")
-    
+
     @test E1 ≈ vec(hv["E1"])
     @test f0 ≈ hv["f0"]
     @test f1 ≈ hv["f1"]
     @test f2 ≈ hv["f2"]
     @test f3 ≈ hv["f3"]
-    
+
     step!(He, f0, f1, f2, f3, E1, h)
-    
+
     he = matread("he.mat")
-    
+
     @test f0 ≈ he["f0"]
     @test f1 ≈ he["f1"]
     @test f2 ≈ he["f2"]
     @test f3 ≈ he["f3"]
-    
+
     step!(H1fh, f0, f1, f2, f3, S1, S2, S3, h, tildeK)
-    
+
     h1fh = matread("h1fh.mat")
-    
+
     @test f0 ≈ h1fh["f0"]
     @test f1 ≈ h1fh["f1"]
     @test f2 ≈ h1fh["f2"]
     @test f3 ≈ h1fh["f3"]
     @test S2 ≈ vec(h1fh["S2"])
     @test S3 ≈ vec(h1fh["S3"])
-    
+
     step!(H2fh, f0, f1, f2, f3, S1, S2, S3, h, tildeK)
-    
+
     h2fh = matread("h2fh.mat")
-    
+
     @test f0 ≈ h2fh["f0"]
     @test f1 ≈ h2fh["f1"]
     @test f2 ≈ h2fh["f2"]
     @test f3 ≈ h2fh["f3"]
     @test S1 ≈ vec(h2fh["S1"])
     @test S3 ≈ vec(h2fh["S3"])
-    
+
     step!(H3fh, f0, f1, f2, f3, S1, S2, S3, h, tildeK)
-   
+
     h3fh = matread("h3fh.mat")
-    
+
     @test f0 ≈ h3fh["f0"]
     @test f1 ≈ h3fh["f1"]
     @test f2 ≈ h3fh["f2"]
     @test f3 ≈ h3fh["f3"]
     @test S1 ≈ vec(h3fh["S1"])
     @test S2 ≈ vec(h3fh["S2"])
-    
+
     @test sol["S1value"][:, end] ≈ S1
     @test sol["S2value"][:, end] ≈ S2
     @test sol["S3value"][:, end] ≈ S3
-    
+
 end

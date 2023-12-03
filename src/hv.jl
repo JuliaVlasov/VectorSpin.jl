@@ -3,24 +3,24 @@ import LinearAlgebra: transpose!
 
 export HvOperator
 
-struct HvOperator
+struct HvOperator{T}
 
-    mesh::Mesh
-    ff0::Matrix{ComplexF64}
-    ff1::Matrix{ComplexF64}
-    ff2::Matrix{ComplexF64}
-    ff3::Matrix{ComplexF64}
-    expv::Matrix{ComplexF64}
+    mesh::Mesh{T}
+    ff0::Matrix{Complex{T}}
+    ff1::Matrix{Complex{T}}
+    ff2::Matrix{Complex{T}}
+    ff3::Matrix{Complex{T}}
+    expv::Matrix{Complex{T}}
 
-    function HvOperator(mesh)
+    function HvOperator(mesh::Mesh{T}) where {T}
 
-        ff0 = zeros(ComplexF64, mesh.nx, mesh.nv)
-        ff1 = zeros(ComplexF64, mesh.nx, mesh.nv)
-        ff2 = zeros(ComplexF64, mesh.nx, mesh.nv)
-        ff3 = zeros(ComplexF64, mesh.nx, mesh.nv)
+        ff0 = zeros(Complex{T}, mesh.nx, mesh.nv)
+        ff1 = zeros(Complex{T}, mesh.nx, mesh.nv)
+        ff2 = zeros(Complex{T}, mesh.nx, mesh.nv)
+        ff3 = zeros(Complex{T}, mesh.nx, mesh.nv)
         expv = exp.(-1im .* mesh.kx .* mesh.vnode')
 
-        new(mesh, ff0, ff1, ff2, ff3, expv)
+        new{T}(mesh, ff0, ff1, ff2, ff3, expv)
 
     end
 
@@ -40,7 +40,15 @@ f_t + vf_x = 0
 ```
 
 """
-function step!(op::HvOperator, f0, f1, f2, f3, E1, dt)
+function step!(
+    op::HvOperator{T},
+    f0::Matrix{T},
+    f1::Matrix{T},
+    f2::Matrix{T},
+    f3::Matrix{T},
+    E1::Vector{Complex{T}},
+    dt::T,
+) where {T}
 
     v = op.mesh.vnode
     k_fre = op.mesh.kx
