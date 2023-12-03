@@ -3,6 +3,9 @@ module VectorSpin
 using DocStringExtensions
 using FFTW
 using .Threads
+import DispersionRelations: fit_complex_frequency
+
+export fit_complex_frequency
 
 include("mesh.jl")
 include("initialfields.jl")
