@@ -6,7 +6,16 @@ using Plots
 using ProgressMeter
 using Statistics
 using VectorSpin
-using SemiLagrangian
+
+try
+    using SemiLagrangian
+    using DoubleFloats
+catch
+    import Pkg; Pkg.add("SemiLagrangian")
+    import Pkg; Pkg.add("DoubleFloats")
+    using SemiLagrangian
+    using DoubleFloats
+end
 
 """
     compute_rho(meshv, f)
@@ -19,6 +28,7 @@ function compute_rho(mesh::Mesh, f::Array{Float64,2})
     dv = mesh.dv
     rho = dv * sum(real(f), dims = 1)
     vec(rho .- mean(rho)) # vec squeezes the 2d array returned by sum function
+
 end
 
 """
@@ -47,9 +57,7 @@ end
 
 function landau_damping(tf::Float64, nt::Int64)
 
-    # Set grid
-    p = 3
-    nx, nv = 128, 256
+    nx, nv = 127, 255
     xmin, xmax = 0.0, 4π
     vmin, vmax = -6.0, 6.0
     mesh = Mesh(xmin, xmax, nx, vmin, vmax, nv)
@@ -77,7 +85,7 @@ function landau_damping(tf::Float64, nt::Int64)
         ρ = compute_rho(mesh, f)
         e = compute_e(mesh, ρ)
 
-        push!(ℰ, 0.5 * log(sum(e .* e) * dx))
+        push!(ℰ, sum(e .* e) * dx)
 
         VectorSpin.advection!(f, adv_v, e, dt)
 
@@ -90,19 +98,19 @@ function landau_damping(tf::Float64, nt::Int64)
 end
 
 
-function run_simulation(nbdt, sz, dt)
+function run_simulation(T::DataType, nbdt, sz, dt)
 
     epsilon = 0.001
 
-    xmin, xmax, nx = 0.0, 4π, sz[1]
-    vmin, vmax, nv = -6.0, 6.0, sz[2]
+    xmin, xmax, nx = T(0.0), T(4π), sz[1]
+    vmin, vmax, nv = -T(6.0), T(6.0), sz[2]
 
     mesh_x = UniformMesh(xmin, xmax, nx)
     mesh_v = UniformMesh(vmin, vmax, nv)
 
     states = [([1, 2], 1, 1, true), ([2, 1], 1, 2, true)]
 
-    interp = Lagrange(9, Float64)
+    interp = Lagrange(9, T)
     tab_coef = strangsplit(dt)
 
     adv = Advection(
@@ -114,38 +122,38 @@ function run_simulation(nbdt, sz, dt)
         timeopt = NoTimeOpt,
     )
 
-    kx = 0.5
+    kx = T(0.5)
     x = mesh_x.points
     v = mesh_v.points
     fx = epsilon * cos.(kx * x) .+ 1
     fv = exp.(-v .^ 2 / 2) ./ sqrt(2π)
-    f = fx .* fv'
+    f = T.(fx .* fv')
 
     pvar = getpoissonvar(adv)
 
     advd = AdvectionData(adv, f, pvar)
 
-    t = Float64[]
-    el = Float64[]
+    t = T[]
+    el = T[]
     @showprogress 1 for i = 1:nbdt
         while SemiLagrangian.advection!(advd)
         end
         push!(t, advd.time_cur)
         ee = compute_ee(advd)
-        push!(el, 0.5 * log(ee))
+        push!(el, ee)
     end
     return t, el
 end
 
 nt = 1000
-tf = 100.0
-t = range(0.0, stop = tf, length = nt)
-
+tf = 200.0
+t = LinRange(0.0, tf, nt)
 
 sz = (128, 256)
 dt = tf / nt
 nrj = landau_damping(tf, nt);
-plot(t, nrj; label = "LocalImplementation")
-plot!(t, -0.1533 * t .- 5.50; label = "-0.1533t.-5.5")
-t, el = run_simulation(nt, sz, dt)
-plot!(t, el, label = "SemiLagrangian")
+plot(t, nrj; label = "PSM+BSpline")
+line, g = fit_complex_frequency(t, nrj)
+plot!(t, line, label = "growth = $(imag(g))")
+t, el = run_simulation(BigFloat, nt, sz, BigFloat(dt))
+plot!(t, el, label = "SemiLagrangian", yscale = :log10)
