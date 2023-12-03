@@ -1,5 +1,5 @@
 import Pkg
-Pkg.add(["DispersionRelations", "ProgressMeter"])
+Pkg.add(["DispersionRelations", "ProgressMeter", "TimerOutputs"])
 
 using FFTW
 using Plots
