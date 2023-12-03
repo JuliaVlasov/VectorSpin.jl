@@ -28,7 +28,6 @@ $(SIGNATURES)
 
 function initialfunction(H, L, N, M, a, frequency, ata)
 
-
     x = (0:(M-1)) .* L ./ M
     v = (1:N) .* 2 .* H ./ N .- H
 

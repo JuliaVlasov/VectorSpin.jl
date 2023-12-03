@@ -9,11 +9,8 @@ function init(k, x, i, v1int, frequency, a, femi, tiK)
 
     # initial Maxwellian
     kk = 1.0
-    if femi ≈ 1
-        femi = 1
-    else
-        femi = 0.5
-    end
+
+    femi = femi ≈ 1 ? 1 : 0.5
 
     f =
         (1.0 / sqrt(pi) / kk) *

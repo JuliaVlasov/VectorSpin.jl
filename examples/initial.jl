@@ -1,16 +1,15 @@
+import Pkg
+Pkg.add(["DispersionRelations", "ProgressMeter"])
+
 using FFTW
-using MAT
 using Plots
 using ProgressMeter
 using TimerOutputs
 using VectorSpin
 
-import Pkg
-Pkg.add(url="https://github.com/johnbcoughlin/DispersionRelations.jl")
 using DispersionRelations
 
 const to = TimerOutput()
-
 
 function maxwellian(k, x, i, v1int, frequency, a, femi, tiK)
 
@@ -44,69 +43,7 @@ function numeint(value, N)
     integral
 end
 
-function energy(f0, f1, f2, f3, E1, S1, S2, S3, mesh, tiK)
-
-    M, N = mesh.nx, mesh.nv
-    L = mesh.xmax - mesh.xmin
-    H = 0.5 * (mesh.vmax - mesh.vmin)
-    mub = 0.3386
-    h_int = 2.0 * mub
-    aj0 = 0.01475 * h_int / 2.0
-    K_xc = tiK
-    n_i = 1.0
-
-    SS1value = real(ifft(1im .* mesh.kx .* fft(S1)))
-    SS2value = real(ifft(1im .* mesh.kx .* fft(S2)))
-    SS3value = real(ifft(1im .* mesh.kx .* fft(S3)))
-
-    EE1value = zeros(M)
-    EE1value = real(ifft(E1))
-    BB1value = -K_xc * n_i * 0.5 * S1
-    BB2value = -K_xc * n_i * 0.5 * S2
-    BB3value = -K_xc * n_i * 0.5 * S3
-
-    Ex_energy = (1 / 2) * sum(EE1value .^ 2) * L / M
-    v1node = (collect(1:N) * 2 * H / N .- H .- H / N)
-    ff0value = zeros(N, M)
-    ff1value = zeros(N, M)
-    ff2value = zeros(N, M)
-    ff3value = zeros(N, M)
-    DS1value = zeros(M)
-    DS2value = zeros(M)
-    DS3value = zeros(M)
-    for j = 1:M
-        for k = 1:N
-            ff0value[k, j] = 1 / 2 * (f0[k, j] * ((v1node[k]^2))) * L / M * 2 * H / N
-            ff1value[k, j] = mub * f1[k, j] * (BB1value[j]) * L / M * 2 * H / N
-            ff2value[k, j] = mub * f2[k, j] * (BB2value[j]) * L / M * 2 * H / N
-            ff3value[k, j] = mub * f3[k, j] * (BB3value[j]) * L / M * 2 * H / N
-        end
-        DS1value[j] = aj0 * n_i * (SS1value[j]^2) * L / M
-        DS2value[j] = aj0 * n_i * (SS2value[j]^2) * L / M
-        DS3value[j] = aj0 * n_i * (SS3value[j]^2) * L / M
-    end
-
-    energykinetic = sum(ff0value)
-    energyBf1 = sum(ff1value)
-    energyBf2 = sum(ff2value)
-    energyBf3 = sum(ff3value)
-    S1energy = sum(DS1value)
-    S2energy = sum(DS2value)
-    S3energy = sum(DS3value)
-    energy =
-        Ex_energy +
-        energykinetic +
-        energyBf1 +
-        energyBf2 +
-        energyBf3 +
-        S1energy +
-        S2energy +
-        S3energy
-    Snorm = maximum(abs.((S1 .^ 2 .+ S2 .^ 2 .+ S3 .^ 2) .- 1))
-
-    return Ex_energy
-
-end
+ex_energy(E1, mesh) = sum(abs2.(ifft(E1))) * mesh.dx
 
 function main(T, M, N, H, kkk, L, h, a)
 
@@ -124,7 +61,6 @@ function main(T, M, N, H, kkk, L, h, a)
     dS1 = zeros(M)
     dS2 = zeros(M)
     dS3 = zeros(M)
-
 
     # initial value of S
     for k = 1:M
@@ -193,7 +129,7 @@ function main(T, M, N, H, kkk, L, h, a)
     t = Float64[]
     e = Float64[]
     push!(t, 0.0)
-    push!(e, energy(f0, f1, f2, f3, E1, S1, S2, S3, mesh, tildeK))
+    push!(e, ex_energy(E1, mesh))
 
     @showprogress 1 for i = 2:NUM # run with time 
         # Lie splitting
@@ -203,7 +139,7 @@ function main(T, M, N, H, kkk, L, h, a)
         @timeit to "H2fh" step!(H2fh, f0, f1, f2, f3, S1, S2, S3, h, tildeK)
         @timeit to "H3fh" step!(H3fh, f0, f1, f2, f3, S1, S2, S3, h, tildeK)
         push!(t, (i - 1) * h)
-        push!(e, energy(f0, f1, f2, f3, E1, S1, S2, S3, mesh, tildeK))
+        push!(e, ex_energy(E1, mesh))
     end
 
 
@@ -217,7 +153,7 @@ M = 119 # mesh number in x direction
 N = 129 # mesh number in v direction
 H = 10.0 / 2 # computational domain [-H/2,H/2] in v
 kx = 0.5 # wave number/frequency
-L = 2pi / kx # computational domain [0,L] in x
+L = 2π / kx # computational domain [0,L] in x
 tildeK = 0.1598 # normalized parameter tildeK
 h = 0.1 # time step size
 a = 0.001 # perturbation for f
