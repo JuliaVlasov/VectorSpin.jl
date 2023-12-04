@@ -15,7 +15,7 @@
 # ---
 
 # +
-using FFTW
+using GenericFFT
 using Plots
 using VectorSpin
 
@@ -26,7 +26,7 @@ H = 10.0 / 2 # computational domain [-H/2,H/2] in v
 k = 0.5      # wave number/frequency
 L = 2π / k   # computational domain [0,L] in x
 
-mesh = Mesh(0, L, M, -H, H, N)
+mesh = Mesh(0.0, L, M, -H, H, N)
 
 Hv = HvOperator(mesh)
 

@@ -20,10 +20,10 @@ struct PSMAdvection{T} <: AbstractAdvection
         c = zeros(T, mesh.nv + 1)
         d = zeros(T, mesh.nv)
 
-        diag = 4 / 3 .* ones(T, mesh.nv + 1)
-        diag[begin] = 2 / 3
-        diag[end] = 2 / 3
-        dsup = 1 / 3 .* ones(T, mesh.nv)
+        diag = 4 // 3 .* ones(T, mesh.nv + 1)
+        diag[begin] = 2 // 3
+        diag[end] = 2 // 3
+        dsup = 1 // 3 .* ones(T, mesh.nv)
         A = SymTridiagonal{T,Vector{T}}(diag, dsup)
 
         new{T}(mesh, a, b, c, d, diag, dsup, A)
@@ -63,9 +63,9 @@ averages ``f_{j,l}(0)`` using the PSM approach.
 """
 function advection!(df, adv::PSMAdvection{T}, v, dt) where {T}
 
-    nx::Int = adv.mesh.nx
-    nv::Int = adv.mesh.nv
-    dv::T = adv.mesh.dv
+    nx = adv.mesh.nx
+    nv = adv.mesh.nv
+    dv = adv.mesh.dv
 
     @inbounds for j in eachindex(v)
 
@@ -84,9 +84,9 @@ function advection!(df, adv::PSMAdvection{T}, v, dt) where {T}
         end
         adv.b[begin] = 0
         for i = 1:nv-1
-            adv.a[i] = 1 / 2 * (adv.b[i+1] - adv.b[i])
+            adv.a[i] = 0.5 * (adv.b[i+1] - adv.b[i])
         end
-        adv.a[end] = -1 / 2 * adv.b[end]
+        adv.a[end] = - 0.5 * adv.b[end]
 
         alpha = v[j] * dt / dv
 
@@ -97,14 +97,14 @@ function advection!(df, adv::PSMAdvection{T}, v, dt) where {T}
 
             if newbeta >= 1.0
                 l = floor(Int, newbeta)
-                k = 1 - (newbeta - l)
+                k = T(1) - (newbeta - l)
             else
                 l = nv
-                k = 1 - newbeta
+                k = T(1) - newbeta
             end
 
             l1 = mod1(l + 1, nv)
-            k1 = 1 - k
+            k1 = T(1) - k
             k2 = k1 * k1
             k3 = k2 * k1
 

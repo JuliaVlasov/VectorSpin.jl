@@ -1,17 +1,17 @@
 using Plots
-using FFTW
+using GenericFFT
 using MAT
 using ProgressMeter
 using VectorSpin
 
 function vlasov_maxwell()
 
-    T = 50 # 4000  # final time
+    T = 500 # 4000  # final time
     nx = 129  # partition of x
     nv = 129   # partition of v
     vmin, vmax = -2.5, 2.5   # v domain size()
     ke = 1.2231333040331807  #ke
-    xmin, xmax = 0, 4pi / ke  # x domain size()
+    xmin, xmax = 0.0, 4pi / ke  # x domain size()
     h = 0.04 #time step size()
     nsteps = floor(Int, T / h + 1.1) # time step number
     a = 0.02 # 0.001; perturbation coefficient
@@ -66,15 +66,15 @@ results = vlasov_maxwell()
 vars = matread(joinpath(@__DIR__, "sVMEata0p2.mat"))
 
 p = plot(layout = (3, 2))
-plot!(p[1, 1], results.time, log.(results.Ex_energy), label = "julia v2")
+plot!(p[1, 1], results.time, log.(results.Ex_energy), label = "julia")
 xlabel!(p[1, 1], "Ex energy - log")
-plot!(p[2, 1], results.time, log.(results.E_energy), label = "julia v2")
+plot!(p[2, 1], results.time, log.(results.E_energy), label = "julia")
 xlabel!(p[2, 1], "E energy - log")
-plot!(p[1, 2], results.time, log.(results.B_energy), label = "julia v2")
+plot!(p[1, 2], results.time, log.(results.B_energy), label = "julia")
 xlabel!(p[1, 2], "B energy - log")
-plot!(p[2, 2], results.time, log.(results.energy), label = "julia v2")
+plot!(p[2, 2], results.time, log.(results.energy), label = "julia")
 xlabel!(p[2, 2], "energy - log")
-plot!(p[3, 1], results.time, results.Sz, label = "julia v2")
+plot!(p[3, 1], results.time, results.Sz, label = "julia")
 xlabel!(p[3, 1], "Sz")
 
 plot!(

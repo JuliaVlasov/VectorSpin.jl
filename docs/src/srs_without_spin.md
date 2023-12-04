@@ -2,7 +2,7 @@
 
 ```julia
 using Plots
-using FFTW
+using GenericFFT
 using VectorSpin
 ```
 

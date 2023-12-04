@@ -1,4 +1,4 @@
-using FFTW
+using GenericFFT
 using MAT
 
 import VectorSpin: initialfunction, initialfields

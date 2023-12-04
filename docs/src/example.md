@@ -3,7 +3,7 @@
 
 ```@example test
 using Plots
-using FFTW
+using GenericFFT
 using VectorSpin
 
 function run()

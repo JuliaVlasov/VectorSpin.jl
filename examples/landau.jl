@@ -1,6 +1,6 @@
 import VectorSpin: bspline
 
-using FFTW
+using GenericFFT
 using LinearAlgebra
 using Plots
 using ProgressMeter
@@ -155,5 +155,5 @@ nrj = landau_damping(tf, nt);
 plot(t, nrj; label = "PSM+BSpline")
 line, g = fit_complex_frequency(t, nrj)
 plot!(t, line, label = "growth = $(imag(g))")
-t, el = run_simulation(BigFloat, nt, sz, BigFloat(dt))
+t, el = run_simulation(Double64, nt, sz, Double64(dt))
 plot!(t, el, label = "SemiLagrangian", yscale = :log10)
