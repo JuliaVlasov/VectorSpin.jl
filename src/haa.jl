@@ -1,6 +1,6 @@
-export HAAOperator
+export HAOperator
 
-struct HAAOperator{T}
+struct HAOperator{T}
 
     mesh::Mesh{T}
     adv0::AbstractAdvection
@@ -13,7 +13,7 @@ struct HAAOperator{T}
     dA3::Vector{Complex{T}}
     delta::Vector{T}
 
-    function HAAOperator(mesh::Mesh{T}) where {T}
+    function HAOperator(mesh::Mesh{T}) where {T}
 
         A2 = zeros(T, mesh.nx)
         A3 = zeros(T, mesh.nx)
@@ -41,9 +41,11 @@ $(SIGNATURES)
 \\dot{Ez} = -\\partial_x^2 A_z + A_z \\rho \\\\
 \\end{aligned}
 ```
+
+[documentation](https://juliavlasov.github.io/VectorSpin.jl/hamiltonian_splitting.html#Subsystem-for-\\mathcal{H}_p)
 """
 function step!(
-    op::HAAOperator{T},
+    op::HAOperator{T},
     f0::Matrix{T},
     f1::Matrix{T},
     f2::Matrix{T},

@@ -44,3 +44,31 @@ function initialfunction(mesh::Mesh{T}, α, kx, σ, ata) where {T}
     return f0, f1, f2, f3
 
 end
+
+export initialize_distribution
+
+function initialize_distribution(mesh, f)
+    
+    df = zeros(mesh.nv, mesh.nx)
+    
+    for j = 1:nx, i = 1:nv
+    
+        v1 = mesh.v[i] - mesh.dv
+        v2 = mesh.v[i] - mesh.dv * 0.75
+        v3 = mesh.v[i] - mesh.dv * 0.50
+        v4 = mesh.v[i] - mesh.dv * 0.25
+        v5 = mesh.v[i]
+    
+        y1 = f(mesh.x[j], v1)
+        y2 = f(mesh.x[j], v2)
+        y3 = f(mesh.x[j], v3)
+        y4 = f(mesh.x[j], v4)
+        y5 = f(mesh.x[j], v5)
+    
+        df[i, j] = (7y1 + 32y2 + 12y3 + 32y4 + 7y5) / 90
+    
+    end
+    
+    df
+    
+end

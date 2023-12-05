@@ -1,7 +1,14 @@
 using VectorSpin
 using Documenter
+using DocumenterCitations
 
 DocMeta.setdocmeta!(VectorSpin, :DocTestSetup, :(using VectorSpin); recursive = true)
+
+
+bib = CitationBibliography(
+    joinpath(@__DIR__, "src", "refs.bib");
+    style=:authoryear
+)
 
 makedocs(;
     modules = [VectorSpin],
@@ -15,10 +22,14 @@ makedocs(;
     ),
     pages = [
         "Home" => "index.md",
+        "Hamiltonian Splitting" => "hamiltonian_splitting.md",
+        "Numerical scheme" => "numerical_scheme.md",
         "Validation" => "srs_without_spin.md",
-        "Example" => "example.md",
+        "Vlasov-Maxwell" => "example.md",
+        "Version with ions" => "spin_ions.md",
         "API" => "api.md",
     ],
+    plugins=[bib]
 )
 
 deploydocs(; repo = "github.com/JuliaVlasov/VectorSpin.jl", devbranch = "main")
