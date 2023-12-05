@@ -30,23 +30,23 @@ function run()
 
     results = Diagnostics(f0, f2, f3, E1, E2, E3, A2, A3, mesh, h_int)
 
-    H2fh = H2fhOperator(mesh)
+    H2 = H2Operator(mesh)
     He = HeOperator(mesh)
     HA = HAOperator(mesh)
-    H3fh = H3fhOperator(mesh)
+    H3 = H3Operator(mesh)
     Hp = HpOperator(mesh)
 
     for i = 1:nsteps # Loop over time
 
-        step!(H2fh, f0, f1, f2, f3, E3, A3, 0.5dt, h_int)
+        step!(H2, f0, f1, f2, f3, E3, A3, 0.5dt, h_int)
         step!(He, f0, f1, f2, f3, E1, E2, E3, A2, A3, 0.5dt)
         step!(HA, f0, f1, f2, f3, E2, E3, A2, A3, 0.5dt)
-        step!(H3fh, f0, f1, f2, f3, E2, A2, 0.5dt, h_int)
+        step!(H3, f0, f1, f2, f3, E2, A2, 0.5dt, h_int)
         step!(Hp, f0, f1, f2, f3, E1, dt)
-        step!(H3fh, f0, f1, f2, f3, E2, A2, 0.5dt, h_int)
+        step!(H3, f0, f1, f2, f3, E2, A2, 0.5dt, h_int)
         step!(HA, f0, f1, f2, f3, E2, E3, A2, A3, 0.5dt)
         step!(He, f0, f1, f2, f3, E1, E2, E3, A2, A3, 0.5dt)
-        step!(H2fh, f0, f1, f2, f3, E3, A3, 0.5dt, h_int)
+        step!(H2, f0, f1, f2, f3, E3, A3, 0.5dt, h_int)
         
         save!(results, i*dt, f0, f2, f3, E1, E2, E3, A2, A3)
 

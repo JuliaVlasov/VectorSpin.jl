@@ -17,9 +17,11 @@ abstract type AbstractAdvection end
 include("psm.jl")
 include("bspline.jl")
 
+include("h2.jl")
 include("h2fh.jl")
 include("he.jl")
 include("haa.jl")
+include("h3.jl")
 include("h3fh.jl")
 include("hp.jl")
 include("h1fh.jl")

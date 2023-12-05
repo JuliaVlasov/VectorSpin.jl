@@ -39,13 +39,13 @@ const kk = 0.17 # v_th
     @test f2 ≈ df["f2"]
     @test f3 ≈ df["f3"]
 
-    H2fh = H2fhOperator(mesh)
+    H2 = H2Operator(mesh)
     He = HeOperator(mesh)
-    HAA = HAAOperator(mesh)
-    H3fh = H3fhOperator(mesh)
-    H1f = H1fOperator(mesh)
+    HA = HAOperator(mesh)
+    H3 = H3Operator(mesh)
+    Hp = HpOperator(mesh)
 
-    step!(H2fh, f0, f1, f2, f3, E3, A3, 0.5dt, h_int)
+    step!(H2, f0, f1, f2, f3, E3, A3, 0.5dt, h_int)
 
     fields = matread("fields1.mat")
     df = matread("df1.mat")
@@ -75,7 +75,7 @@ const kk = 0.17 # v_th
     @test f2 ≈ df["f2"]
     @test f3 ≈ df["f3"]
 
-    step!(HAA, f0, f1, f2, f3, E2, E3, A2, A3, 0.5dt)
+    step!(HA, f0, f1, f2, f3, E2, E3, A2, A3, 0.5dt)
 
     fields = matread("fields3.mat")
     df = matread("df3.mat")
@@ -90,7 +90,7 @@ const kk = 0.17 # v_th
     @test f2 ≈ df["f2"]
     @test f3 ≈ df["f3"]
 
-    step!(H3fh, f0, f1, f2, f3, E2, A2, 0.5dt, h_int)
+    step!(H3, f0, f1, f2, f3, E2, A2, 0.5dt, h_int)
 
     fields = matread("fields4.mat")
     df = matread("df4.mat")
@@ -105,7 +105,7 @@ const kk = 0.17 # v_th
     @test f2 ≈ df["f2"]
     @test f3 ≈ df["f3"]
 
-    step!(H1f, f0, f1, f2, f3, E1, dt)
+    step!(Hp, f0, f1, f2, f3, E1, dt)
 
     fields = matread("fields5.mat")
     df = matread("df5.mat")

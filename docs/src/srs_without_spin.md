@@ -105,25 +105,25 @@ function run(final_time, f0, f1, f2, f3, E1, E2, E3, A2, A3)
     
     data = Diagnostics(f0, f2, f3, E1, E2, E3, A2, A3, mesh, h_int)
     
-    H2fh = H2fhOperator(mesh)
+    H2 = H2fhOperator(mesh)
     He = HeOperator(mesh)
     HA = HAOperator(mesh)
-    H3fh = H3fhOperator(mesh)
+    H3 = H3fhOperator(mesh)
     Hp = HpOperator(mesh)
     
     save!(data, 0.0, f0, f2, f3, E1, E2, E3, A2, A3)
     
     @showprogress 1 for i = 1:nsteps 
     
-        step!(H2fh, f0, f1, f2, f3, E3, A3, dt / 2, h_int)
+        step!(H2, f0, f1, f2, f3, E3, A3, dt / 2, h_int)
         step!(He, f0, f1, f2, f3, E1, E2, E3, A2, A3, dt / 2)
         step!(HA, f0, f1, f2, f3, E2, E3, A2, A3, dt / 2)
-        step!(H3fh, f0, f1, f2, f3, E2, A2, dt / 2, h_int)
+        step!(H3, f0, f1, f2, f3, E2, A2, dt / 2, h_int)
         step!(Hp, f0, f1, f2, f3, E1, dt)
-        step!(H3fh, f0, f1, f2, f3, E2, A2, dt / 2, h_int)
+        step!(H3, f0, f1, f2, f3, E2, A2, dt / 2, h_int)
         step!(HA, f0, f1, f2, f3, E2, E3, A2, A3, dt / 2)
         step!(He, f0, f1, f2, f3, E1, E2, E3, A2, A3, dt / 2)
-        step!(H2fh, f0, f1, f2, f3, E3, A3, dt / 2, h_int)
+        step!(H2, f0, f1, f2, f3, E3, A3, dt / 2, h_int)
         save!(data, i * dt, f0, f2, f3, E1, E2, E3, A2, A3)
     
     end
