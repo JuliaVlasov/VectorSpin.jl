@@ -1,6 +1,6 @@
-export H3fhOperator
+export H3fhSubsystem
 
-struct H3fhOperator{T}
+struct H3fhSubsystem{T}
 
     adv1::AbstractAdvection
     adv2::AbstractAdvection
@@ -15,7 +15,7 @@ struct H3fhOperator{T}
     n_i::T
     mub::T
 
-    function H3fhOperator(mesh::Mesh{T}; n_i = 1.0, mub = 0.3386) where {T}
+    function H3fhSubsystem(mesh::Mesh{T}; n_i = 1.0, mub = 0.3386) where {T}
 
 
         adv1 = PSMAdvection(mesh)
@@ -41,7 +41,7 @@ $(SIGNATURES)
 compute the subsystem Hs3
 """
 function step!(
-    op::H3fhOperator{T},
+    op::H3fhSubsystem{T},
     f0::Matrix{T},
     f1::Matrix{T},
     f2::Matrix{T},

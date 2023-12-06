@@ -1,6 +1,6 @@
-export HpOperator
+export HpSubsystem
 
-struct HpOperator{T}
+struct HpSubsystem{T}
 
     mesh::Mesh{T}
     ff0::Matrix{Complex{T}}
@@ -9,7 +9,7 @@ struct HpOperator{T}
     ff3::Matrix{Complex{T}}
     epv::Matrix{Complex{T}}
 
-    function HpOperator(mesh::Mesh{T}) where {T}
+    function HpSubsystem(mesh::Mesh{T}) where {T}
 
         ff0 = zeros(Complex{T}, mesh.nx, mesh.nv)
         ff1 = zeros(Complex{T}, mesh.nx, mesh.nv)
@@ -26,12 +26,12 @@ end
 """
 $(SIGNATURES)
 
-Operator to solve ``H_p`` subsystem
+Subsystem to solve ``H_p`` subsystem
 
 [documentation](https://juliavlasov.github.io/VectorSpin.jl/dev/hamiltonian_splitting.html#Subsystem-for-\\mathcal{H}_p)
 """
 function step!(
-    op::HpOperator{T},
+    op::HpSubsystem{T},
     f0::Matrix{T},
     f1::Matrix{T},
     f2::Matrix{T},

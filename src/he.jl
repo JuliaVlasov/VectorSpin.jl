@@ -1,8 +1,8 @@
 using .Threads
 
-export HeOperator
+export HeSubsystem
 
-struct HeOperator{T}
+struct HeSubsystem{T}
 
     adv0::AbstractAdvection
     adv1::AbstractAdvection
@@ -10,7 +10,7 @@ struct HeOperator{T}
     adv3::AbstractAdvection
     e::Vector{T}
 
-    function HeOperator(mesh::Mesh{T}) where {T}
+    function HeSubsystem(mesh::Mesh{T}) where {T}
 
         e = zeros(T, mesh.nx)
         adv0 = PSMAdvection(mesh)
@@ -36,7 +36,7 @@ f_t - Ef_v = 0
 
 """
 function step!(
-    op::HeOperator{T},
+    op::HeSubsystem{T},
     f0::Matrix{T},
     f1::Matrix{T},
     f2::Matrix{T},
@@ -65,7 +65,7 @@ end
 
 
 function step!(
-    op::HeOperator{T},
+    op::HeSubsystem{T},
     f0::Matrix{T},
     f1::Matrix{T},
     f2::Matrix{T},

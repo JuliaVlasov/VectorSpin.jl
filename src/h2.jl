@@ -1,6 +1,6 @@
-export H2Operator
+export H2Subsystem
 
-struct H2Operator{T}
+struct H2Subsystem{T}
 
     adv1::AbstractAdvection
     adv2::AbstractAdvection
@@ -15,7 +15,7 @@ struct H2Operator{T}
     n_i::T
     mub::T
 
-    function H2Operator(mesh::Mesh{T}; n_i = 1.0, mub = 0.3386) where {T}
+    function H2Subsystem(mesh::Mesh{T}; n_i = 1.0, mub = 0.3386) where {T}
 
         adv1 = PSMAdvection(mesh)
         adv2 = PSMAdvection(mesh)
@@ -42,7 +42,7 @@ $(SIGNATURES)
 
 """
 function step!(
-    op::H2Operator{T},
+    op::H2Subsystem{T},
     f0::Matrix{T},
     f1::Matrix{T},
     f2::Matrix{T},

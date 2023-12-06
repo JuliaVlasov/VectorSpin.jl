@@ -100,11 +100,11 @@ using VectorSpin
         f3[i, k] = (7y1 + 32y2 + 12y3 + 32y4 + 7y5) / 90
     end
     
-    Hv = HvOperator(mesh)
-    He = HeOperator(mesh)
-    H1fh = H1fhOperator(mesh)
-    H2fh = H2fhOperator(mesh)
-    H3fh = H3fhOperator(mesh)
+    Hv = HvSubsystem(mesh)
+    He = HeSubsystem(mesh)
+    H1fh = H1fhSubsystem(mesh)
+    H2fh = H2fhSubsystem(mesh)
+    H3fh = H3fhSubsystem(mesh)
 
     # Lie splitting
     # Lie splitting

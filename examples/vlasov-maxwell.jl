@@ -36,11 +36,11 @@ function vlasov_maxwell()
 
     data = Diagnostics(f0, f2, f3, E1, E2, E3, A2, A3, mesh, h_int)
 
-    H2fh = H2fhOperator(mesh)
-    He = HeOperator(mesh)
-    HAA = HAAOperator(mesh)
-    H3fh = H3fhOperator(mesh)
-    H1f = H1fOperator(mesh)
+    H2fh = H2fhSubsystem(mesh)
+    He = HeSubsystem(mesh)
+    HAA = HAASubsystem(mesh)
+    H3fh = H3fhSubsystem(mesh)
+    H1f = H1fSubsystem(mesh)
 
     @showprogress 1 for i = 1:nsteps # Loop over time
 

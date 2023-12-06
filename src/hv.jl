@@ -1,9 +1,9 @@
 using .Threads
 import LinearAlgebra: transpose!
 
-export HvOperator
+export HvSubsystem
 
-struct HvOperator{T}
+struct HvSubsystem{T}
 
     mesh::Mesh{T}
     ff0::Matrix{Complex{T}}
@@ -12,7 +12,7 @@ struct HvOperator{T}
     ff3::Matrix{Complex{T}}
     expv::Matrix{Complex{T}}
 
-    function HvOperator(mesh::Mesh{T}) where {T}
+    function HvSubsystem(mesh::Mesh{T}) where {T}
 
         ff0 = zeros(Complex{T}, mesh.nx, mesh.nv)
         ff1 = zeros(Complex{T}, mesh.nx, mesh.nv)
@@ -41,7 +41,7 @@ f_t + vf_x = 0
 
 """
 function step!(
-    op::HvOperator{T},
+    op::HvSubsystem{T},
     f0::Matrix{T},
     f1::Matrix{T},
     f2::Matrix{T},

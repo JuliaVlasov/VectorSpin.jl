@@ -1,6 +1,6 @@
-export H1fhOperator
+export H1fhSubsystem
 
-struct H1fhOperator{T}
+struct H1fhSubsystem{T}
 
     adv1::AbstractAdvection
     adv2::AbstractAdvection
@@ -14,7 +14,7 @@ struct H1fhOperator{T}
     n_i::T
     mub::T
 
-    function H1fhOperator(mesh::Mesh{T}; n_i = 1.0, mub = 0.3386) where {T}
+    function H1fhSubsystem(mesh::Mesh{T}; n_i = 1.0, mub = 0.3386) where {T}
 
         adv1 = PSMAdvection(mesh)
         adv2 = PSMAdvection(mesh)
@@ -41,7 +41,7 @@ M is even number
 
 """
 function step!(
-    op::H1fhOperator{T},
+    op::H1fhSubsystem{T},
     f0::Matrix{T},
     f1::Matrix{T},
     f2::Matrix{T},

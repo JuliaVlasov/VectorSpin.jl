@@ -30,11 +30,11 @@ function run()
 
     results = Diagnostics(f0, f2, f3, E1, E2, E3, A2, A3, mesh, h_int)
 
-    H2 = H2Operator(mesh)
-    He = HeOperator(mesh)
-    HA = HAOperator(mesh)
-    H3 = H3Operator(mesh)
-    Hp = HpOperator(mesh)
+    H2 = H2Subsystem(mesh)
+    He = HeSubsystem(mesh)
+    HA = HASubsystem(mesh)
+    H3 = H3Subsystem(mesh)
+    Hp = HpSubsystem(mesh)
 
     for i = 1:nsteps # Loop over time
 

@@ -28,7 +28,7 @@ L = 2π / k   # computational domain [0,L] in x
 
 mesh = Mesh(0.0, L, M, -H, H, N)
 
-Hv = HvOperator(mesh)
+Hv = HvSubsystem(mesh)
 
 a = 0.001
 x = (0:(M-1)) .* L / M # mesh in x

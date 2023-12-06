@@ -120,11 +120,11 @@ function main(T::DataType, final_time, xmin, xmax, nx, vmin, vmax, nv, kx, dt, a
 
     f0, f1, f2, f3 = initialize(mesh, kx, a, femi1, femi2, tiK)
 
-    Hv = HvOperator(mesh)
-    He = HeOperator(mesh)
-    H1fh = H1fhOperator(mesh)
-    H2fh = H2fhOperator(mesh)
-    H3fh = H3fhOperator(mesh)
+    Hv = HvSubsystem(mesh)
+    He = HeSubsystem(mesh)
+    H1fh = H1fhSubsystem(mesh)
+    H2fh = H2fhSubsystem(mesh)
+    H3fh = H3fhSubsystem(mesh)
 
     t = T[]
     e = T[]

@@ -1,6 +1,6 @@
-export HAOperator
+export HASubsystem
 
-struct HAOperator{T}
+struct HASubsystem{T}
 
     mesh::Mesh{T}
     adv0::AbstractAdvection
@@ -13,7 +13,7 @@ struct HAOperator{T}
     dA3::Vector{Complex{T}}
     delta::Vector{T}
 
-    function HAOperator(mesh::Mesh{T}) where {T}
+    function HASubsystem(mesh::Mesh{T}) where {T}
 
         A2 = zeros(T, mesh.nx)
         A3 = zeros(T, mesh.nx)
@@ -45,7 +45,7 @@ $(SIGNATURES)
 [documentation](https://juliavlasov.github.io/VectorSpin.jl/hamiltonian_splitting.html#Subsystem-for-\\mathcal{H}_p)
 """
 function step!(
-    op::HAOperator{T},
+    op::HASubsystem{T},
     f0::Matrix{T},
     f1::Matrix{T},
     f2::Matrix{T},

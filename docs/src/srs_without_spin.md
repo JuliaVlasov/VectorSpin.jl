@@ -105,11 +105,11 @@ function run(final_time, f0, f1, f2, f3, E1, E2, E3, A2, A3)
     
     data = Diagnostics(f0, f2, f3, E1, E2, E3, A2, A3, mesh, h_int)
     
-    H2 = H2fhOperator(mesh)
-    He = HeOperator(mesh)
-    HA = HAOperator(mesh)
-    H3 = H3fhOperator(mesh)
-    Hp = HpOperator(mesh)
+    H2 = H2fhSubsystem(mesh)
+    He = HeSubsystem(mesh)
+    HA = HASubsystem(mesh)
+    H3 = H3fhSubsystem(mesh)
+    Hp = HpSubsystem(mesh)
     
     save!(data, 0.0, f0, f2, f3, E1, E2, E3, A2, A3)
     

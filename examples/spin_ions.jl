@@ -91,12 +91,12 @@ function main(T)
     e = Float64[]
     push!(e, ex_energy(E1, L, M))
 
-    Hv = HvOperator(mesh)
+    Hv = HvSubsystem(mesh)
     adv = PSMAdvection(mesh)
-    He = HeOperator(mesh)
-    H1fh = H1fhOperator(mesh)
-    H2fh = H2fhOperator(mesh)
-    H3fh = H3fhOperator(mesh)
+    He = HeSubsystem(mesh)
+    H1fh = H1fhSubsystem(mesh)
+    H2fh = H2fhSubsystem(mesh)
+    H3fh = H3fhSubsystem(mesh)
 
     @showprogress 1 for i = 1:nsteps
         step!(Hv, f0, f1, f2, f3, E1, h)
