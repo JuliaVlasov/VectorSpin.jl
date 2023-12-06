@@ -102,7 +102,7 @@ end
 
 export ex_energy
 
-ex_energy(E1, L, M) = 0.5 * sum(real(ifft(E1)) .^ 2) * L / M
+ex_energy(E1, mesh) = 0.5 * sum(real(ifft(E1)) .^ 2) * mesh.dx
 
 export bf_energy
 

@@ -35,10 +35,6 @@ end
 
 """
 $(SIGNATURES)
-
-compute the subsystem Hs1
-M is even number
-
 """
 function step!(
     op::H1fhSubsystem{T},
@@ -63,23 +59,25 @@ function step!(
 
     ifft!(op.partial)
 
-    for i in eachindex(op.partial)
+    @inbounds for i in eachindex(op.partial)
         op.v1[i] = -real(op.partial[i]) * mub
         op.v2[i] = -op.v1[i]
     end
 
     @sync begin
         @spawn begin
-            op.u1 .= 0.5 .* f0 .+ 0.5 .* f1
+            op.u1 .= 0.5 .* f0 
+            op.u1 .+= 0.5 .* f1
             advection!(op.u1, op.adv1, op.v1, dt)
         end
         @spawn begin
-            op.u2 .= 0.5 .* f0 .- 0.5 .* f1
+            op.u2 .= 0.5 .* f0 
+            op.u2 .-= 0.5 .* f1
             advection!(op.u2, op.adv2, op.v2, dt)
         end
     end
 
-    for i in eachindex(S1)
+    @inbounds for i in eachindex(S1)
         B10 = -K_xc * n_i * 0.5 * S1[i]
         for j in axes(f2, 1)
             f2[j, i] = cos(dt * B10) * f2[j, i] - sin(dt * B10) * f3[j, i]
@@ -90,7 +88,7 @@ function step!(
     op.partial .= -op.mesh.kx .^ 2 .* op.fS1
     ifft!(op.partial)
 
-    for i in eachindex(S3)
+    @inbounds for i in eachindex(S3)
 
         temi = K_xc / 4 * sum(view(f1, :, i)) * op.mesh.dv + 0.01475 * real(op.partial[i])
 
@@ -99,7 +97,7 @@ function step!(
 
     end
 
-    for i in eachindex(f0, f1)
+    @inbounds for i in eachindex(f0, f1)
         f0[i] = op.u1[i] + op.u2[i]
         f1[i] = op.u1[i] - op.u2[i]
     end

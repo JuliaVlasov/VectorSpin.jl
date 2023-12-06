@@ -8,7 +8,7 @@ using Statistics
 using VectorSpin
 
 try
-    using SemiLagrangian
+    import SemiLagrangian
     using DoubleFloats
 catch
     import Pkg; Pkg.add("SemiLagrangian")

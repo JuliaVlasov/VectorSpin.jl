@@ -13,14 +13,13 @@
 # ---
 
 # +
-using GenericFFT
-using Plots
+using BenchmarkTools
 using VectorSpin
 
-const M = 100 # mesh number in x direction
-const N = 200 # mesh number in v direction
-const H = 10.0  # computational domain [-H/2,H/2] in v
-const L = 10.0  # computational domain [0,L] in x
+M = 100 # mesh number in x direction
+N = 200 # mesh number in v direction
+H = 10.0  # computational domain [-H/2,H/2] in v
+L = 10.0  # computational domain [0,L] in x
 
 xmin, xmax, nx = 0.0, L, M
 vmin, vmax, nv = -H, H, N
@@ -35,8 +34,9 @@ for i = 1:M, j = 1:N
     f[j, i] = exp(-(mesh.x[i] - 5)^2) * exp(-(mesh.v[j] - 5)^2)
 end
 
-@gif for i = 1:10
-    advection!(f, adv, ones(M), dt)
-    contour(mesh.x, mesh.v, f; aspect_ratio = 1, legend = :none)
-end
+v = ones(M)
+
+advection!(f, adv, v, dt)
+
+@time advection!(f, adv, v, dt)
 

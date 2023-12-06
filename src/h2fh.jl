@@ -59,7 +59,7 @@ function step!(
     op.u1 .= f1
     op.u2 .= f3
 
-    for i in eachindex(S2)
+    @inbounds for i in eachindex(S2)
         B20 = -K_xc * op.n_i * 0.5 * S2[i]
         for j = 1:op.mesh.nv
             f1[j, i] = cos(dt * B20) * op.u1[j, i] + sin(dt * B20) * op.u2[j, i]
@@ -95,7 +95,7 @@ function step!(
     end
 
     # v1 and v2 are used vor new values of S1 and S2 to reduce memeory print
-    for i = 1:op.mesh.nx
+    @inbounds for i = 1:op.mesh.nx
         temi = K_xc / 4 * sum(view(f2, :, i)) * op.mesh.dv + 0.01475 * real(op.partial[i])
         op.v1[i] = cos(dt * temi) * S1[i] - sin(dt * temi) * S3[i]
         op.v2[i] = sin(dt * temi) * S1[i] + cos(dt * temi) * S3[i]

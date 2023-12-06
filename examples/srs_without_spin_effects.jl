@@ -68,33 +68,8 @@ we = 1.0629
 #     
 
 # +
-f(x, v) = exp(-0.5 * v^2 / vth^2) * (1 + alpha * cos(ke * x)) / sqrt(2π) / vth
+fcos(x, v) = exp(-0.5 * v^2 / vth^2) * (1 + alpha * cos(ke * x)) / sqrt(2π) / vth
 
-function initialize_distribution(mesh, f)
-    
-    df = zeros(mesh.nv, mesh.nx)
-    
-    for j = 1:nx, i = 1:nv
-    
-        v1 = mesh.v[i] - mesh.dv
-        v2 = mesh.v[i] - mesh.dv * 0.75
-        v3 = mesh.v[i] - mesh.dv * 0.50
-        v4 = mesh.v[i] - mesh.dv * 0.25
-        v5 = mesh.v[i]
-    
-        y1 = f(mesh.x[j], v1)
-        y2 = f(mesh.x[j], v2)
-        y3 = f(mesh.x[j], v3)
-        y4 = f(mesh.x[j], v4)
-        y5 = f(mesh.x[j], v5)
-    
-        df[i, j] = (7y1 + 32y2 + 12y3 + 32y4 + 7y5) / 90
-    
-    end
-    
-    df
-    
-end
 # -
 
 # and the initial longitudinal electric field
@@ -140,25 +115,25 @@ function run(final_time, f0, f1, f2, f3, E1, E2, E3, A2, A3)
     
     data = Diagnostics(f0, f2, f3, E1, E2, E3, A2, A3, mesh, h_int)
     
-    H2fh = H2fhSubsystem(mesh)
+    H2 = H2Subsystem(mesh)
     He = HeSubsystem(mesh)
     HA = HASubsystem(mesh)
-    H3fh = H3fhSubsystem(mesh)
+    H3 = H3Subsystem(mesh)
     Hp = HpSubsystem(mesh)
     
     save!(data, 0.0, f0, f2, f3, E1, E2, E3, A2, A3)
     
     @showprogress 1 for i = 1:nsteps 
     
-        step!(H2fh, f0, f1, f2, f3, E3, A3, dt / 2, h_int)
+        step!(H2, f0, f1, f2, f3, E3, A3, dt / 2, h_int)
         step!(He, f0, f1, f2, f3, E1, E2, E3, A2, A3, dt / 2)
         step!(HA, f0, f1, f2, f3, E2, E3, A2, A3, dt / 2)
-        step!(H3fh, f0, f1, f2, f3, E2, A2, dt / 2, h_int)
+        step!(H3, f0, f1, f2, f3, E2, A2, dt / 2, h_int)
         step!(Hp, f0, f1, f2, f3, E1, dt)
-        step!(H3fh, f0, f1, f2, f3, E2, A2, dt / 2, h_int)
+        step!(H3, f0, f1, f2, f3, E2, A2, dt / 2, h_int)
         step!(HA, f0, f1, f2, f3, E2, E3, A2, A3, dt / 2)
         step!(He, f0, f1, f2, f3, E1, E2, E3, A2, A3, dt / 2)
-        step!(H2fh, f0, f1, f2, f3, E3, A3, dt / 2, h_int)
+        step!(H2, f0, f1, f2, f3, E3, A3, dt / 2, h_int)
         save!(data, i * dt, f0, f2, f3, E1, E2, E3, A2, A3)
     
     end
@@ -172,7 +147,7 @@ E2 = fft(E0 .* cos.(k0 .* mesh.x))
 E3 = fft(E0 .* sin.(k0 .* mesh.x))
 A2 = -fft(E0 ./ w0 .* sin.(k0 .* mesh.x))
 A3 = fft(E0 ./ w0 .* cos.(k0 .* mesh.x))
-f0 = initialize_distribution(mesh, f)
+f0 = initialize_distribution(mesh, fcos)
 f1 = zeros(mesh.nx, mesh.nv)
 f2 = zeros(mesh.nx, mesh.nv)
 f3 = zeros(mesh.nx, mesh.nv)
@@ -192,7 +167,7 @@ E2 = fft(E0 .* cos.(k0 .* mesh.x))
 E3 = fft(E0 .* sin.(k0 .* mesh.x))
 A2 = -fft(E0 ./ w0 .* sin.(k0 .* mesh.x))
 A3 = fft(E0 ./ w0 .* cos.(k0 .* mesh.x))
-f0 = initialize_distribution(mesh, f)
+f0 = initialize_distribution(mesh, fcos)
 f1 = zeros(mesh.nx, mesh.nv)
 f2 = zeros(mesh.nx, mesh.nv)
 f3 = zeros(mesh.nx, mesh.nv)

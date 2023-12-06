@@ -3,10 +3,13 @@ using GenericFFT
 using MAT
 using ProgressMeter
 using VectorSpin
+using TimerOutputs
+
+const to = TimerOutput()
 
 function vlasov_maxwell()
 
-    T = 500 # 4000  # final time
+    T = 50 # 4000  # final time
     nx = 129  # partition of x
     nv = 129   # partition of v
     vmin, vmax = -2.5, 2.5   # v domain size()
@@ -36,23 +39,23 @@ function vlasov_maxwell()
 
     data = Diagnostics(f0, f2, f3, E1, E2, E3, A2, A3, mesh, h_int)
 
-    H2fh = H2fhSubsystem(mesh)
+    H2 = H2Subsystem(mesh)
     He = HeSubsystem(mesh)
-    HAA = HAASubsystem(mesh)
-    H3fh = H3fhSubsystem(mesh)
-    H1f = H1fSubsystem(mesh)
+    HA = HASubsystem(mesh)
+    H3 = H3Subsystem(mesh)
+    Hp = HpSubsystem(mesh)
 
     @showprogress 1 for i = 1:nsteps # Loop over time
 
-        step!(H2fh, f0, f1, f2, f3, E3, A3, h / 2, h_int)
-        step!(He, f0, f1, f2, f3, E1, E2, E3, A2, A3, h / 2)
-        step!(HAA, f0, f1, f2, f3, E2, E3, A2, A3, h / 2)
-        step!(H3fh, f0, f1, f2, f3, E2, A2, h / 2, h_int)
-        step!(H1f, f0, f1, f2, f3, E1, h)
-        step!(H3fh, f0, f1, f2, f3, E2, A2, h / 2, h_int)
-        step!(HAA, f0, f1, f2, f3, E2, E3, A2, A3, h / 2)
-        step!(He, f0, f1, f2, f3, E1, E2, E3, A2, A3, h / 2)
-        step!(H2fh, f0, f1, f2, f3, E3, A3, h / 2, h_int)
+        @timeit to "H2" step!(H2, f0, f1, f2, f3, E3, A3, h / 2, h_int)
+        @timeit to "He" step!(He, f0, f1, f2, f3, E1, E2, E3, A2, A3, h / 2)
+        @timeit to "HA" step!(HA, f0, f1, f2, f3, E2, E3, A2, A3, h / 2)
+        @timeit to "H3" step!(H3, f0, f1, f2, f3, E2, A2, h / 2, h_int)
+        @timeit to "Hp" step!(Hp, f0, f1, f2, f3, E1, h)
+        @timeit to "H3" step!(H3, f0, f1, f2, f3, E2, A2, h / 2, h_int)
+        @timeit to "HA" step!(HA, f0, f1, f2, f3, E2, E3, A2, A3, h / 2)
+        @timeit to "He" step!(He, f0, f1, f2, f3, E1, E2, E3, A2, A3, h / 2)
+        @timeit to "H2" step!(H2, f0, f1, f2, f3, E3, A3, h / 2, h_int)
         save!(data, i * h, f0, f2, f3, E1, E2, E3, A2, A3)
 
     end
@@ -64,6 +67,8 @@ end
 results = vlasov_maxwell()
 
 vars = matread(joinpath(@__DIR__, "sVMEata0p2.mat"))
+
+show(to)
 
 p = plot(layout = (3, 2))
 plot!(p[1, 1], results.time, log.(results.Ex_energy), label = "julia")

@@ -6,28 +6,24 @@ struct H2Subsystem{T}
     adv2::AbstractAdvection
     mesh::Mesh{T}
     partial::Vector{Complex{T}}
-    fS2::Vector{Complex{T}}
     v1::Vector{T}
     v2::Vector{T}
     u1::Matrix{T}
     u2::Matrix{T}
     f2::Matrix{Complex{T}}
-    n_i::T
-    mub::T
 
-    function H2Subsystem(mesh::Mesh{T}; n_i = 1.0, mub = 0.3386) where {T}
+    function H2Subsystem(mesh::Mesh{T}) where {T}
 
         adv1 = PSMAdvection(mesh)
         adv2 = PSMAdvection(mesh)
         partial = zeros(Complex{T}, mesh.nx)
-        fS2 = zeros(Complex{T}, mesh.nx)
         v1 = zeros(T, mesh.nx)
         v2 = zeros(T, mesh.nx)
         u1 = zeros(T, mesh.nv, mesh.nx)
         u2 = zeros(T, mesh.nv, mesh.nx)
         f2 = zeros(Complex{T}, mesh.nx, mesh.nv)
 
-        new{T}(adv1, adv2, mesh, partial, fS2, v1, v2, u1, u2, f2, n_i, mub)
+        new{T}(adv1, adv2, mesh, partial, v1, v2, u1, u2, f2)
 
     end
 
@@ -83,8 +79,11 @@ function step!(
 
     f0 .= op.u1 .+ op.u2
     f2 .= op.u1 ./ sqrt(3) .- op.u2 ./ sqrt(3)
-    op.u1 .= cos.(dt .* real(op.partial')) .* f1 .+ sin.(dt .* real(op.partial')) .* f3
-    op.u2 .= -sin.(dt .* real(op.partial')) .* f1 .+ cos.(dt .* real(op.partial')) .* f3
+
+    @sync begin
+        @spawn op.u1 .= cos.(dt .* real(op.partial')) .* f1 .+ sin.(dt .* real(op.partial')) .* f3
+        @spawn op.u2 .= -sin.(dt .* real(op.partial')) .* f1 .+ cos.(dt .* real(op.partial')) .* f3
+    end
 
     fft!(op.f2, 1)
     E3 .-= dt .* h_int .* (1im .* kx) .* vec(sum(op.f2, dims = 2)) .* dv

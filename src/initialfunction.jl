@@ -47,16 +47,16 @@ end
 
 export initialize_distribution
 
-function initialize_distribution(mesh, f)
+function initialize_distribution(mesh::Mesh{T}, f) where {T}
     
-    df = zeros(mesh.nv, mesh.nx)
+    df = zeros(T, mesh.nv, mesh.nx)
     
-    for j = 1:nx, i = 1:nv
+    for j = eachindex(mesh.x), i = eachindex(mesh.v)
     
         v1 = mesh.v[i] - mesh.dv
-        v2 = mesh.v[i] - mesh.dv * 0.75
-        v3 = mesh.v[i] - mesh.dv * 0.50
-        v4 = mesh.v[i] - mesh.dv * 0.25
+        v2 = mesh.v[i] - mesh.dv * T(0.75)
+        v3 = mesh.v[i] - mesh.dv * T(0.50)
+        v4 = mesh.v[i] - mesh.dv * T(0.25)
         v5 = mesh.v[i]
     
         y1 = f(mesh.x[j], v1)
@@ -65,7 +65,7 @@ function initialize_distribution(mesh, f)
         y4 = f(mesh.x[j], v4)
         y5 = f(mesh.x[j], v5)
     
-        df[i, j] = (7y1 + 32y2 + 12y3 + 32y4 + 7y5) / 90
+        df[i, j] = (7y1 + 32y2 + 12y3 + 32y4 + 7y5) / T(90)
     
     end
     
