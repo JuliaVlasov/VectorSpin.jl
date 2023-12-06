@@ -94,7 +94,7 @@ function step!(
             mul!(op.ff1, op.p1, op.f1)
             op.ff1 .*= op.ev .^ dt
             ldiv!(op.f1, op.p1, op.ff1)
-            transpose!(op.ff1, f1)
+            transpose!(f1, real(op.f1))
         end
 
         @spawn begin
@@ -102,7 +102,7 @@ function step!(
             mul!(op.ff2, op.p2, op.f2)
             op.ff2 .*= op.ev .^ dt
             ldiv!(op.f2, op.p2, op.ff2)
-            transpose!(op.ff2, f2)
+            transpose!(f2, real(op.f2))
         end
 
         @spawn begin
@@ -110,7 +110,7 @@ function step!(
             mul!(op.ff3, op.p3, op.f3)
             op.ff3 .*= op.ev .^ dt
             ldiv!(op.f3, op.p3, op.ff3)
-            transpose!(op.ff3, f3)
+            transpose!(f3, real(op.f3))
         end
     end
 
