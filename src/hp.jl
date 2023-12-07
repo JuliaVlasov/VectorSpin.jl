@@ -55,10 +55,11 @@ function step!(
             fft!(op.ff0, 1)
 
             @inbounds for i = 2:nx
-                E1[i] +=
-                    1 / (1im * kx[i]) *
-                    sum(view(op.ff0, i, :) .* (view(op.epv, i, :) .- 1.0)) *
-                    dv
+                rho = zero(T)
+                for j in eachindex(v)
+                    rho += op.ff0[ i, j] * (exp.(-1im * kx[i] * v[j] * dt) - 1.0)
+                end
+                E1[i] += 1.0 / (1im * kx[i]) * rho * dv
             end
 
             op.ff0 .*= op.epv

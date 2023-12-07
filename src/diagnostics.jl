@@ -161,7 +161,7 @@ export energy
 function energy(f0, f1, f2, f3, S1, S2, S3, E1, M, N, L, H, tiK, n_i)
 
     res = sum(s_energy(S1, S2, S3, M, N, L, H))
-    res += ex_energy(E1, L, M)
+    res += 0.5 * sum(real(ifft(E1)) .^ 2) * L / M
     res += sum(bf_energy(f1, f2, f3, S1, S2, S3, M, N, L, H, tiK, n_i))
     res += kinetic_energy(f0, M, N, L, H)
 
