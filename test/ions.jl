@@ -107,7 +107,6 @@ using VectorSpin
     H3fh = H3fhSubsystem(mesh)
 
     # Lie splitting
-    # Lie splitting
     step!(Hv, f0, f1, f2, f3, E1, h)
 
     hv = matread("hv.mat")
