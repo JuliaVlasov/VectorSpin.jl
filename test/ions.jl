@@ -16,7 +16,6 @@ using VectorSpin
     h = 0.1 # time step size()
     nsteps = 1 # floor(Int, T / h + 1.1) # time step number
     x = (0:(M-1)) .* L / M # mesh in x
-    v1 = (1:N) * 2 * H / N .- H # mesh in v
 
     a = 0.001 # perturbation for f
     E1 = fft(-1.0 * a / kx * sin.(kx * x)) # electric field
@@ -81,6 +80,9 @@ using VectorSpin
     hv = matread("hv.mat")
 
     @test E1 ≈ vec(hv["E1"])
+    @test S1 ≈ vec(hv["S1"])
+    @test S2 ≈ vec(hv["S2"])
+    @test S3 ≈ vec(hv["S3"])
     @test f0 ≈ hv["f0"]
     @test f1 ≈ hv["f1"]
     @test f2 ≈ hv["f2"]
@@ -90,6 +92,10 @@ using VectorSpin
 
     he = matread("he.mat")
 
+    @test E1 ≈ vec(he["E1"])
+    @test S1 ≈ vec(he["S1"])
+    @test S2 ≈ vec(he["S2"])
+    @test S3 ≈ vec(he["S3"])
     @test f0 ≈ he["f0"]
     @test f1 ≈ he["f1"]
     @test f2 ≈ he["f2"]
@@ -99,34 +105,40 @@ using VectorSpin
 
     h1fh = matread("h1fh.mat")
 
+    @test E1 ≈ vec(h1fh["E1"])
+    @test S1 ≈ vec(h1fh["S1"])
+    @test S2 ≈ vec(h1fh["S2"])
+    @test S3 ≈ vec(h1fh["S3"])
     @test f0 ≈ h1fh["f0"]
     @test f1 ≈ h1fh["f1"]
     @test f2 ≈ h1fh["f2"]
     @test f3 ≈ h1fh["f3"]
-    @test S2 ≈ vec(h1fh["S2"])
-    @test S3 ≈ vec(h1fh["S3"])
 
     step!(H2fh, f0, f1, f2, f3, S1, S2, S3, h, tildeK)
 
     h2fh = matread("h2fh.mat")
 
+    @test E1 ≈ vec(h2fh["E1"])
+    @test S1 ≈ vec(h2fh["S1"])
+    @test S2 ≈ vec(h2fh["S2"])
+    @test S3 ≈ vec(h2fh["S3"])
     @test f0 ≈ h2fh["f0"]
     @test f1 ≈ h2fh["f1"]
     @test f2 ≈ h2fh["f2"]
     @test f3 ≈ h2fh["f3"]
-    @test S1 ≈ vec(h2fh["S1"])
-    @test S3 ≈ vec(h2fh["S3"])
 
     step!(H3fh, f0, f1, f2, f3, S1, S2, S3, h, tildeK)
 
     h3fh = matread("h3fh.mat")
 
+    @test E1 ≈ vec(h3fh["E1"])
+    @test S1 ≈ vec(h3fh["S1"])
+    @test S2 ≈ vec(h3fh["S2"])
+    @test S3 ≈ vec(h3fh["S3"])
     @test f0 ≈ h3fh["f0"]
     @test f1 ≈ h3fh["f1"]
     @test f2 ≈ h3fh["f2"]
     @test f3 ≈ h3fh["f3"]
-    @test S1 ≈ vec(h3fh["S1"])
-    @test S2 ≈ vec(h3fh["S2"])
 
     @test sol["S1value"][:, end] ≈ S1
     @test sol["S2value"][:, end] ≈ S2
