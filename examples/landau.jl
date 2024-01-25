@@ -1,6 +1,6 @@
 import VectorSpin: bspline
 
-using GenericFFT
+using FFTW
 using LinearAlgebra
 using Plots
 using ProgressMeter
@@ -11,8 +11,10 @@ try
     import SemiLagrangian
     using DoubleFloats
 catch
-    import Pkg; Pkg.add("SemiLagrangian")
-    import Pkg; Pkg.add("DoubleFloats")
+    import Pkg
+    Pkg.add("SemiLagrangian")
+    import Pkg
+    Pkg.add("DoubleFloats")
     using SemiLagrangian
     using DoubleFloats
 end

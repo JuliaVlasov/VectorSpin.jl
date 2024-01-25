@@ -1,5 +1,5 @@
 using Plots
-using GenericFFT
+using FFTW
 using MAT
 using ProgressMeter
 using VectorSpin

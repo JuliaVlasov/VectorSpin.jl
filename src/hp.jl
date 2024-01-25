@@ -57,7 +57,7 @@ function step!(
             @inbounds for i = 2:nx
                 rho = zero(T)
                 for j in eachindex(v)
-                    rho += op.ff0[ i, j] * (exp.(-1im * kx[i] * v[j] * dt) - 1.0)
+                    rho += op.ff0[i, j] * (exp.(-1im * kx[i] * v[j] * dt) - 1.0)
                 end
                 E1[i] += 1.0 / (1im * kx[i]) * rho * dv
             end

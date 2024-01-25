@@ -66,12 +66,12 @@ function step!(
 
     @sync begin
         @spawn begin
-            op.u1 .= 0.5 .* f0 
+            op.u1 .= 0.5 .* f0
             op.u1 .+= 0.5 .* f1
             advection!(op.u1, op.adv1, op.v1, dt)
         end
         @spawn begin
-            op.u2 .= 0.5 .* f0 
+            op.u2 .= 0.5 .* f0
             op.u2 .-= 0.5 .* f1
             advection!(op.u2, op.adv2, op.v2, dt)
         end

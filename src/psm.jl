@@ -86,7 +86,7 @@ function advection!(df, adv::PSMAdvection{T}, v, dt) where {T}
         for i = 1:nv-1
             adv.a[i] = 0.5 * (adv.b[i+1] - adv.b[i])
         end
-        adv.a[end] = - 0.5 * adv.b[end]
+        adv.a[end] = -0.5 * adv.b[end]
 
         alpha = v[j] * dt / dv
 

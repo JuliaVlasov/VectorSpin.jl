@@ -1,7 +1,7 @@
 module VectorSpin
 
 using DocStringExtensions
-using GenericFFT
+using FFTW
 using .Threads
 import DispersionRelations: fit_complex_frequency
 

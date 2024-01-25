@@ -1,4 +1,4 @@
-using GenericFFT
+using FFTW
 using VectorSpin
 using MAT
 using ProgressMeter
@@ -31,13 +31,13 @@ function main(T::DataType, final_time, xmin, xmax, nx, vmin, vmax, nv, kx, dt, a
     end
 
     function maxwellian0(x, v)
-        vth = 1.0 
+        vth = 1.0
         femi = 1.0
         f = (1 / sqrt(pi) / vth) * exp(-(v / vth)^2) * (1 + a * cos(kx * x)) * femi
         return f
     end
     function maxwellian3(x, v)
-        vth = 1.0 
+        vth = 1.0
         femi = 0.5
         f = (1 / sqrt(pi) / vth) * exp(-(v / vth)^2) * (1 + a * cos(kx * x)) * femi
         return f
@@ -70,14 +70,14 @@ function main(T::DataType, final_time, xmin, xmax, nx, vmin, vmax, nv, kx, dt, a
 
     @showprogress 1 for i = 1:nsteps # run with time 
 
-        @test f0value[:,i] ≈ f0
-        @test f1value[:,i] ≈ f1
-        @test f2value[:,i] ≈ f2
-        @test f3value[:,i] ≈ f3
+        @test f0value[:, i] ≈ f0
+        @test f1value[:, i] ≈ f1
+        @test f2value[:, i] ≈ f2
+        @test f3value[:, i] ≈ f3
 
-        @test S1value[:,i] ≈ S1
-        @test S2value[:,i] ≈ S2
-        @test S3value[:,i] ≈ S3
+        @test S1value[:, i] ≈ S1
+        @test S2value[:, i] ≈ S2
+        @test S3value[:, i] ≈ S3
 
         step!(Hv, f0, f1, f2, f3, E1, dt)
         step!(He, f0, f1, f2, f3, E1, dt)

@@ -59,7 +59,7 @@ function step!(
     op.partial .= (-((K_xc * op.n_i * 0.5 * 1im * k)) .* op.fS3)
     ifft!(op.partial)
 
-    @inbounds for i = eachindex(op.v1, op.v2)
+    @inbounds for i in eachindex(op.v1, op.v2)
         op.v1[i] = -dt * real(op.partial[i]) * op.mub
         op.v2[i] = -op.v1[i]
         op.partial[i] = -(k[i]^2) * op.fS3[i]

@@ -39,4 +39,3 @@ v = ones(M)
 advection!(f, adv, v, dt)
 
 @time advection!(f, adv, v, dt)
-

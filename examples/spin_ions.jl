@@ -1,4 +1,4 @@
-using GenericFFT
+using FFTW
 using MAT
 using Plots
 using VectorSpin
@@ -48,13 +48,13 @@ function main(T)
     dv = mesh.dv
 
     function maxwellian0(x, v)
-        vth = 1.0 
+        vth = 1.0
         femi = 1
         return (1 / sqrt(pi) / vth) * exp(-(v / vth)^2) * (1 + a * cos(kx * x)) * femi
     end
 
     function maxwellian3(x, v)
-        vth = 1.0 
+        vth = 1.0
         femi = 0.5
         return (1 / sqrt(pi) / vth) * exp(-(v / vth)^2) * (1 + a * cos(kx * x)) * femi
     end
@@ -63,7 +63,7 @@ function main(T)
     f1 = zeros(nv, nx)
     f2 = zeros(nv, nx)
     f3 = initialize_distribution(mesh, maxwellian3)
-    
+
     t = Float64[]
     push!(t, 0.0)
     e = Float64[]

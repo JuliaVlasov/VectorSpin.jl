@@ -76,8 +76,10 @@ function step!(
     f3 .= op.u1 ./ sqrt(3) .- op.u2 ./ sqrt(3)
 
     @sync begin
-        @spawn op.u1 .= cos.(dt .* real(op.partial')) .* f1 .+ sin.(dt .* real(op.partial')) .* f2
-        @spawn op.u2 .= -sin.(dt .* real(op.partial')) .* f1 .+ cos.(dt .* real(op.partial')) .* f2
+        @spawn op.u1 .=
+            cos.(dt .* real(op.partial')) .* f1 .+ sin.(dt .* real(op.partial')) .* f2
+        @spawn op.u2 .=
+            -sin.(dt .* real(op.partial')) .* f1 .+ cos.(dt .* real(op.partial')) .* f2
     end
 
     copyto!(f1, op.u1)
@@ -87,4 +89,3 @@ function step!(
         E2[i] += dt * h_int * 1im * k[i] * sum(view(op.f3, i, :)) * dv
     end
 end
-

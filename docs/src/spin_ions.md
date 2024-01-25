@@ -3,7 +3,7 @@
 
 ```@example ions
 
-using GenericFFT
+using FFTW
 using Plots
 using VectorSpin
 

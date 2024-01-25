@@ -101,7 +101,7 @@ function advection!(f, adv::BSplineAdvection, v, dt)
 
         # compute interpolating spline using fft and properties of circulant matrices
 
-        for i in axes(adv.fhat,1)
+        for i in axes(adv.fhat, 1)
             adv.fhat[i, j] *= adv.eigalpha[i] ./ adv.eig_bspl[i]
         end
 

@@ -1,6 +1,6 @@
 import Pkg
 
-using GenericFFT
+using FFTW
 
 try
     using Plots
@@ -54,13 +54,13 @@ function main(T::DataType, final_time, xmin, xmax, nx, vmin, vmax, nv, kx, dt, a
     end
 
     function maxwellian0(x, v)
-        vth = 1.0 
+        vth = 1.0
         femi = 1.0
         f = (1 / sqrt(pi) / vth) * exp(-(v / vth)^2) * (1 + a * cos(kx * x)) * femi
         return f
     end
     function maxwellian3(x, v)
-        vth = 1.0 
+        vth = 1.0
         femi = 0.5
         f = (1 / sqrt(pi) / vth) * exp(-(v / vth)^2) * (1 + a * cos(kx * x)) * femi
         return f

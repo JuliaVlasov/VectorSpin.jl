@@ -17,7 +17,7 @@
 # # Stimulated Raman Scattering without spin 
 
 using Plots
-using GenericFFT
+using FFTW
 using ProgressMeter
 using VectorSpin
 
@@ -106,25 +106,25 @@ fcos(x, v) = exp(-0.5 * v^2 / vth^2) * (1 + alpha * cos(ke * x)) / sqrt(2π) / v
 # $$
 
 function run(final_time, f0, f1, f2, f3, E1, E2, E3, A2, A3)
-    
-    dt = 0.05 
+
+    dt = 0.05
     nsteps = ceil(Int, final_time / dt + 1)
     k0 = 2.0 * ke
     w0 = sqrt(1.0 + k0^2) # w0
     h_int = 0.0
-    
+
     data = Diagnostics(f0, f2, f3, E1, E2, E3, A2, A3, mesh, h_int)
-    
+
     H2 = H2Subsystem(mesh)
     He = HeSubsystem(mesh)
     HA = HASubsystem(mesh)
     H3 = H3Subsystem(mesh)
     Hp = HpSubsystem(mesh)
-    
+
     save!(data, 0.0, f0, f2, f3, E1, E2, E3, A2, A3)
-    
-    @showprogress 1 for i = 1:nsteps 
-    
+
+    @showprogress 1 for i = 1:nsteps
+
         step!(H2, f0, f1, f2, f3, E3, A3, dt / 2, h_int)
         step!(He, f0, f1, f2, f3, E1, E2, E3, A2, A3, dt / 2)
         step!(HA, f0, f1, f2, f3, E2, E3, A2, A3, dt / 2)
@@ -135,13 +135,13 @@ function run(final_time, f0, f1, f2, f3, E1, E2, E3, A2, A3)
         step!(He, f0, f1, f2, f3, E1, E2, E3, A2, A3, dt / 2)
         step!(H2, f0, f1, f2, f3, E3, A3, dt / 2, h_int)
         save!(data, i * dt, f0, f2, f3, E1, E2, E3, A2, A3)
-    
+
     end
     data
 end
 
 final_time = 150
-E0 = 0.325 
+E0 = 0.325
 E1 = fft(alpha ./ ke .* sin.(ke .* mesh.x))
 E2 = fft(E0 .* cos.(k0 .* mesh.x))
 E3 = fft(E0 .* sin.(k0 .* mesh.x))
@@ -161,7 +161,7 @@ xlabel!("ωₚt")
 png("srs_1")
 
 final_time = 80
-E0 = 0.65 
+E0 = 0.65
 E1 = fft(alpha ./ ke .* sin.(ke .* mesh.x))
 E2 = fft(E0 .* cos.(k0 .* mesh.x))
 E3 = fft(E0 .* sin.(k0 .* mesh.x))
@@ -180,11 +180,17 @@ xlabel!("ωₚt")
 
 png("srs2")
 
-plot(data1.time, abs.(data1.energy .- first(data1.energy)) ./ first(data1.energy), label="E₀=Eref")
-plot!(data2.time, abs.(data2.energy .- first(data2.energy)) ./ first(data2.energy), label="E₀=2Eref")
+plot(
+    data1.time,
+    abs.(data1.energy .- first(data1.energy)) ./ first(data1.energy),
+    label = "E₀=Eref",
+)
+plot!(
+    data2.time,
+    abs.(data2.energy .- first(data2.energy)) ./ first(data2.energy),
+    label = "E₀=2Eref",
+)
 xlabel!("ωₚt")
 ylabel!("relative energy")
 
 png("srs3")
-
-

@@ -7,7 +7,7 @@ and ``{\mathfrak h}=0``. More details in the section *Numerical experiments* in 
 
 ```julia
 using Plots
-using GenericFFT
+using FFTW
 using ProgressMeter
 using VectorSpin
 ```

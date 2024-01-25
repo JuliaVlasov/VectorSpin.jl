@@ -15,10 +15,10 @@ struct HvSubsystem{T}
     ff2::Matrix{Complex{T}}
     ff3::Matrix{Complex{T}}
     ev::Matrix{Complex{T}}
-    p0::GenericFFT.FFTW.cFFTWPlan{Complex{T}, -1, false, 2, Int64}
-    p1::GenericFFT.FFTW.cFFTWPlan{Complex{T}, -1, false, 2, Int64}
-    p2::GenericFFT.FFTW.cFFTWPlan{Complex{T}, -1, false, 2, Int64}
-    p3::GenericFFT.FFTW.cFFTWPlan{Complex{T}, -1, false, 2, Int64}
+    p0::FFTW.cFFTWPlan{Complex{T},-1,false,2,Int64}
+    p1::FFTW.cFFTWPlan{Complex{T},-1,false,2,Int64}
+    p2::FFTW.cFFTWPlan{Complex{T},-1,false,2,Int64}
+    p3::FFTW.cFFTWPlan{Complex{T},-1,false,2,Int64}
 
     function HvSubsystem(mesh::Mesh{T}) where {T}
 
@@ -34,10 +34,10 @@ struct HvSubsystem{T}
 
         ev = exp.(-1im .* mesh.kx .* mesh.vnode')
 
-        p0 = plan_fft(f0,  1, flags=GenericFFT.FFTW.PATIENT)    
-        p1 = plan_fft(f1,  1, flags=GenericFFT.FFTW.PATIENT)    
-        p2 = plan_fft(f2,  1, flags=GenericFFT.FFTW.PATIENT)    
-        p3 = plan_fft(f3,  1, flags=GenericFFT.FFTW.PATIENT)    
+        p0 = plan_fft(f0, 1, flags = FFTW.PATIENT)
+        p1 = plan_fft(f1, 1, flags = FFTW.PATIENT)
+        p2 = plan_fft(f2, 1, flags = FFTW.PATIENT)
+        p3 = plan_fft(f3, 1, flags = FFTW.PATIENT)
 
         new{T}(mesh, f0, f1, f2, f3, ff0, ff1, ff2, ff3, ev, p0, p1, p2, p3)
 
