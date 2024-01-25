@@ -7,7 +7,7 @@ using Test
 function main(T::DataType, final_time, xmin, xmax, nx, vmin, vmax, nv, kx, dt, a, tiK)
 
     mesh = Mesh(T(xmin), T(xmax), nx, T(vmin), T(vmax), nv)
-    nsteps = floor(Int, final_time / dt + 1.1) # time step number
+    @show nsteps = floor(Int, final_time / dt + 1.1) # time step number
     E1 = fft(-1.0 * a / kx * sin.(kx * mesh.x)) # electric field
     epsil = a # perturbation for S
 
@@ -60,9 +60,24 @@ function main(T::DataType, final_time, xmin, xmax, nx, vmin, vmax, nv, kx, dt, a
     push!(e, ex_energy(E1, mesh))
 
     results = matread("results.mat")
+    f0value = results["f0value"]
+    f1value = results["f1value"]
+    f2value = results["f2value"]
+    f3value = results["f3value"]
     S1value = results["S1value"]
+    S2value = results["S2value"]
+    S3value = results["S3value"]
 
-    for i = 2:nsteps # run with time 
+    @showprogress 1 for i = 1:nsteps # run with time 
+
+        @test f0value[:,i] ≈ f0
+        @test f1value[:,i] ≈ f1
+        @test f2value[:,i] ≈ f2
+        @test f3value[:,i] ≈ f3
+
+        @test S1value[:,i] ≈ S1
+        @test S2value[:,i] ≈ S2
+        @test S3value[:,i] ≈ S3
 
         step!(Hv, f0, f1, f2, f3, E1, dt)
         step!(He, f0, f1, f2, f3, E1, dt)
@@ -70,8 +85,6 @@ function main(T::DataType, final_time, xmin, xmax, nx, vmin, vmax, nv, kx, dt, a
         step!(H2fh, f0, f1, f2, f3, S1, S2, S3, dt, tildeK)
         step!(H3fh, f0, f1, f2, f3, S1, S2, S3, dt, tildeK)
 
-        @show i
-        @test S1value[:,i-1] ≈ S1
 
         push!(t, (i - 1) * dt)
         push!(e, ex_energy(E1, mesh))
@@ -85,7 +98,7 @@ end
 T = Float64
 
 # mesh and parameters 
-final_time = 10 # final simulation time
+final_time = 100 # final simulation time
 nx = 119 # mesh number in x direction
 nv = 129 # mesh number in v direction
 vmin, vmax = -T(5.0), T(5.0) # computational domain [-H/2,H/2] in v
@@ -96,8 +109,3 @@ dt = T(0.1) # time step size
 a = T(0.001) # perturbation for f
 
 t, e = main(T, final_time, xmin, xmax, nx, vmin, vmax, nv, kx, dt, a, tildeK)
-
-show(to)
-plot(t, e, label = "ex energy", yscale = :log10)
-line, γ = fit_complex_frequency(t, e)
-plot!(t, line, label = "γ = $(imag(γ))", legend = :bottomleft)
