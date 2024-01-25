@@ -69,20 +69,24 @@ function step!(
     dt::T,
 ) where {T}
 
-    v = op.mesh.vnode
-    kx = op.mesh.kx
+    k = op.mesh.kx
+    v = op.mesh.vnode 
+
+    for j in eachindex(v), i in eachindex(k)
+        op.ev[i,j] = exp(-1im * k[i] * v[j] * dt)
+    end
 
     @sync begin
 
         @spawn begin
             transpose!(op.f0, f0)
             mul!(op.ff0, op.p0, op.f0)
-            op.ff0 .*= op.ev .^ dt
+            op.ff0 .*= op.ev
 
             E1 .= vec(sum(op.ff0, dims = 2))
             E1[1] = 0.0
             @inbounds for i = 2:op.mesh.nx
-                E1[i] *= op.mesh.dv / (-1im * kx[i])
+                E1[i] *= op.mesh.dv / (-1im * k[i])
             end
 
             ldiv!(op.f0, op.p0, op.ff0)
@@ -92,7 +96,7 @@ function step!(
         @spawn begin
             transpose!(op.f1, f1)
             mul!(op.ff1, op.p1, op.f1)
-            op.ff1 .*= op.ev .^ dt
+            op.ff1 .*= op.ev
             ldiv!(op.f1, op.p1, op.ff1)
             transpose!(f1, real(op.f1))
         end
@@ -100,7 +104,7 @@ function step!(
         @spawn begin
             transpose!(op.f2, f2)
             mul!(op.ff2, op.p2, op.f2)
-            op.ff2 .*= op.ev .^ dt
+            op.ff2 .*= op.ev
             ldiv!(op.f2, op.p2, op.ff2)
             transpose!(f2, real(op.f2))
         end
@@ -108,7 +112,7 @@ function step!(
         @spawn begin
             transpose!(op.f3, f3)
             mul!(op.ff3, op.p3, op.f3)
-            op.ff3 .*= op.ev .^ dt
+            op.ff3 .*= op.ev
             ldiv!(op.f3, op.p3, op.ff3)
             transpose!(f3, real(op.f3))
         end
