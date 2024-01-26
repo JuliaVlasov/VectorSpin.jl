@@ -46,44 +46,21 @@ function main(T)
         S3[k] = 1.0 / normx
     end
 
-    function maxwellian(x, v, kx, a, femi)
-    
-        vth = 1.0 
-        femi = femi == 1 ? 1 : 0.5
-        return (1 / sqrt(pi) / vth) * exp(-(v / vth)^2) * (1 + a * cos(kx * x)) * femi
-    
+    function maxwellian0(x, v)
+        vth, femi = 1.0, 1.0
+        f = (1 / sqrt(pi) / vth) * exp(-(v / vth)^2) * (1 + a * cos(kx * x)) * femi
+        return f
+    end
+    function maxwellian3(x, v)
+        vth, femi = 1.0, 0.5
+        f = (1 / sqrt(pi) / vth) * exp(-(v / vth)^2) * (1 + a * cos(kx * x)) * femi
+        return f
     end
 
-    f0 = zeros(nv, nx)
-    f1 = zeros(nv, nx)
-    f2 = zeros(nv, nx)
-    f3 = zeros(nv, nx)
-    
-    for k = 1:nx, i = 1:nv
-        v1 = mesh.v[i] - mesh.dv
-        v2 = mesh.v[i] - mesh.dv * 0.75
-        v3 = mesh.v[i] - mesh.dv * 0.50
-        v4 = mesh.v[i] - mesh.dv * 0.25
-        v5 = mesh.v[i]
-        
-        x = mesh.x[k]
-    
-        y1 = maxwellian(x, v1, kx, a, femi1)
-        y2 = maxwellian(x, v2, kx, a, femi1)
-        y3 = maxwellian(x, v3, kx, a, femi1)
-        y4 = maxwellian(x, v4, kx, a, femi1)
-        y5 = maxwellian(x, v5, kx, a, femi1)
-    
-        f0[i, k] = (7y1 + 32y2 + 12y3 + 32y4 + 7y5) / 90
-
-        y1 = maxwellian(x, v1, kx, a, femi2)
-        y2 = maxwellian(x, v2, kx, a, femi2)
-        y3 = maxwellian(x, v3, kx, a, femi2)
-        y4 = maxwellian(x, v4, kx, a, femi2)
-        y5 = maxwellian(x, v5, kx, a, femi2)
-    
-        f3[i, k] = (7y1 + 32y2 + 12y3 + 32y4 + 7y5) / 90
-    end
+    f0 = initialize_distribution(mesh, maxwellian0)
+    f1 = zeros(mesh.nv, mesh.nx)
+    f2 = zeros(mesh.nv, mesh.nx)
+    f3 = initialize_distribution(mesh, maxwellian3)
 
     ex_energy(E1, mesh) = sum(abs2.(ifft(E1))) * mesh.dx
 
