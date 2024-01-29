@@ -56,8 +56,8 @@ function step!(
 
     K_xc = tiK
 
-    op.u1 .= f1
-    op.u2 .= f3
+    copyto!(op.u1, f1)
+    copyto!(op.u2, f3)
 
     @inbounds for i in eachindex(S2)
         B20 = -K_xc * op.n_i * 0.5 * S2[i]
@@ -69,7 +69,10 @@ function step!(
 
     op.fS2 .= fft(S2)
 
-    op.partial .= -K_xc * op.n_i * 0.5 * 1im .* op.mesh.kx .* op.fS2
+    for i in eachindex(op.mesh.kx)
+        op.partial[i] = - K_xc * op.n_i * 0.5 * 1im * op.mesh.kx[i] * op.fS2[i]
+    end
+
     ifft!(op.partial)
 
     for i = 1:op.mesh.nx
@@ -101,8 +104,10 @@ function step!(
         op.v2[i] = sin(dt * temi) * S1[i] + cos(dt * temi) * S3[i]
     end
 
-    f0 .= op.u1 .+ op.u2
-    f2 .= op.u1 .- op.u2
+    for i in eachindex(f0, f2)
+        f0[i] = op.u1[i] + op.u2[i]
+        f2[i] = op.u1[i] - op.u2[i]
+    end
 
     copyto!(S1, op.v1)
     copyto!(S3, op.v2)

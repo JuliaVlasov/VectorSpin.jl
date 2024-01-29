@@ -32,7 +32,7 @@ struct HvSubsystem{T}
         ff2 = zeros(Complex{T}, mesh.nx, mesh.nv)
         ff3 = zeros(Complex{T}, mesh.nx, mesh.nv)
 
-        ev = exp.(-1im .* mesh.kx .* mesh.vnode')
+        ev = zeros(Complex{T}, mesh.nx, mesh.nv)
 
         p0 = plan_fft(f0, 1, flags = FFTW.PATIENT)
         p1 = plan_fft(f1, 1, flags = FFTW.PATIENT)

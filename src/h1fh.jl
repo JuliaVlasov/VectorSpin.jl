@@ -55,7 +55,9 @@ function step!(
 
     op.fS1 .= fft(S1)
 
-    op.partial .= -K_xc * n_i * 0.5 * 1im .* op.mesh.kx .* op.fS1
+    for i in eachindex(op.mesh.kx)
+        op.partial[i] = -K_xc * n_i * 0.5 * 1im * op.mesh.kx[i] * op.fS1[i]
+    end
 
     ifft!(op.partial)
 

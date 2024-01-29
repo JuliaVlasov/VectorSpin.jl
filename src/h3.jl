@@ -72,8 +72,10 @@ function step!(
     op.partial .= 1im .* k .* A2
     ifft!(op.partial)
 
-    f0 .= op.u1 .+ op.u2
-    f3 .= op.u1 ./ sqrt(3) .- op.u2 ./ sqrt(3)
+    for i in eachindex(f0, f3)
+        f0[i] = op.u1[i] + op.u2[i]
+        f3[i] = op.u1[i] / sqrt(3) - op.u2[i] / sqrt(3)
+    end
 
     @sync begin
         @spawn op.u1 .=
