@@ -5,8 +5,9 @@ using VectorSpin
 using ProgressMeter
 
 function main(T)
+
     M = 119 # mesh number in x direction
-    N = 149 # mesh number in v direction
+    N = 169 # mesh number in v direction
     H = 6.0 # computational domain [-H/2,H/2] in v
     kx = 0.5 # wave number/frequency
     L = 2π / kx # computational domain [0,L] in x
@@ -64,10 +65,9 @@ function main(T)
     f2 = zeros(nv, nx)
     f3 = initialize_distribution(mesh, maxwellian3)
 
-    t = Float64[]
-    push!(t, 0.0)
-    e = Float64[]
-    push!(e, ex_energy(E1, mesh))
+    t = Float64[]; push!(t, 0.0)
+    e = Float64[]; push!(e, ex_energy(E1, mesh))
+    s = Float64[]; push!(s, smod(S1))
 
     Hv = HvSubsystem(mesh)
     He = HeSubsystem(mesh)
@@ -83,14 +83,15 @@ function main(T)
         step!(H3fh, f0, f1, f2, f3, S1, S2, S3, h, tildeK)
         push!(t, i * h)
         push!(e, ex_energy(E1, mesh))
+        push!(s, smod(S1))
     end
 
-    t, e
+    t, e, s
 
 end
 
-T = 500 # final simulation time
+T = 1000 # final simulation time
 
-t, e = main(T)
+t, e, s = main(T)
 
 plot(t, e, yscale = :log10)

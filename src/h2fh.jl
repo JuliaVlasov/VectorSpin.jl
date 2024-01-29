@@ -86,12 +86,16 @@ function step!(
     @sync begin
 
         @spawn begin
-            op.u1 .= 0.5 .* f0 .+ 0.5 .* f2
+            for i in eachindex(f0, f2)
+                op.u1[i] = 0.5 * f0[i] + 0.5 * f2[i]
+            end
             advection!(op.u1, op.adv1, op.v1, dt)
         end
 
         @spawn begin
-            op.u2 .= 0.5 .* f0 .- 0.5 .* f2
+            for i in eachindex(f0, f2)
+                op.u2[i] = 0.5 * f0[i] - 0.5 * f2[i]
+            end
             advection!(op.u2, op.adv2, op.v2, dt)
         end
 
