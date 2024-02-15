@@ -100,7 +100,7 @@ end
 T = Float64
 
 # mesh and parameters 
-final_time = 200 # final simulation time
+final_time = 500 # final simulation time
 nx = 129 # mesh number in x direction
 nv = 159 # mesh number in v direction
 vmin, vmax = -T(6.0), T(6.0) # computational domain [-H/2,H/2] in v
@@ -116,3 +116,11 @@ show(to)
 plot(t, e, label = "ex energy", yscale = :log10)
 line, γ = fit_complex_frequency(t, e)
 plot!(t, line, label = "γ = $(imag(γ))", legend = :bottomleft)
+
+
+using DelimitedFiles
+
+open("initial_results.txt", "w") do io
+   writedlm(io, [t e], ',')
+end
+

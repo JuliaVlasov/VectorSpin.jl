@@ -19,3 +19,4 @@ Manifest.toml
 examples/.DS_Store
 .DS_Store
 *.ipynb
+initial_results.txt
