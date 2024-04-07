@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Hamiltonian Splitting · VectorSpin.jl</title><meta name="title" content="Hamiltonian Splitting · VectorSpin.jl"/><meta property="og:title" content="Hamiltonian Splitting · VectorSpin.jl"/><meta property="twitter:title" content="Hamiltonian Splitting · VectorSpin.jl"/><meta name="description" content="Documentation for VectorSpin.jl."/><meta property="og:description" content="Documentation for VectorSpin.jl."/><meta property="twitter:description" content="Documentation for VectorSpin.jl."/><meta property="og:url" content="https://JuliaVlasov.github.io/VectorSpin.jl/hamiltonian_splitting/"/><meta property="twitter:url" content="https://JuliaVlasov.github.io/VectorSpin.jl/hamiltonian_splitting/"/><link rel="canonical" href="https://JuliaVlasov.github.io/VectorSpin.jl/hamiltonian_splitting/"/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">VectorSpin.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li class="is-active"><a class="tocitem" href>Hamiltonian Splitting</a><ul class="internal"><li><a class="tocitem" href="#Subsystem-for-\\mathcal{H}_p"><span>Subsystem for <span>$\mathcal{H}_p$</span></span></a></li><li><a class="tocitem" href="#Subsystem-for-\\mathcal{H}_A"><span>Subsystem for <span>$\mathcal{H}_A$</span></span></a></li><li><a class="tocitem" href="#Subsystem-for-\\mathcal{H}_E"><span>Subsystem for <span>$\mathcal{H}_E$</span></span></a></li><li><a class="tocitem" href="#Subsystem-for-\\mathcal{H}_2"><span>Subsystem for <span>$\mathcal{H}_2$</span></span></a></li><li><a class="tocitem" href="#Subsystem-for-\\mathcal{H}_3"><span>Subsystem for <span>$\mathcal{H}_3$</span></span></a></li></ul></li><li><a class="tocitem" href="../numerical_scheme/">Numerical scheme</a></li><li><a class="tocitem" href="../srs_without_spin/">Validation</a></li><li><a class="tocitem" href="../example/">Vlasov-Maxwell</a></li><li><a class="tocitem" href="../spin_ions/">Version with ions</a></li><li><a class="tocitem" href="../api/">API</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Hamiltonian Splitting</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Hamiltonian Splitting</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/JuliaVlasov/VectorSpin.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/JuliaVlasov/VectorSpin.jl/blob/main/docs/src/hamiltonian_splitting.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Hamiltonian-splitting"><a class="docs-heading-anchor" href="#Hamiltonian-splitting">Hamiltonian splitting</a><a id="Hamiltonian-splitting-1"></a><a class="docs-heading-anchor-permalink" href="#Hamiltonian-splitting" title="Permalink"></a></h1><p class="math-container">\[\mathcal{H}=\mathcal{H}_{p}+\mathcal{H}_{A}+\mathcal{H}_{E}+\mathcal{H}_{2}+\mathcal{H}_{3},\]</p><p>where </p><p class="math-container">\[\begin{aligned}
+\mathcal{H}_{p} &amp; = \frac{1}{2}\int p^2 f_0 \mathrm{d}{ x}\mathrm{d}{p},\\
+\mathcal{H}_{A} &amp;= \frac{1}{2}\int |{\mathbf A}_\perp|^2 f_0 \mathrm{d}{ x}\mathrm{d}{ p}+\frac{1}{2}\int \left|\frac{\partial {\mathbf A}_\perp}{\partial x}\right|^2 \mathrm{d}{x},\\
+\mathcal{H}_{E} &amp;= \frac{1}{2}\int |{\mathbf E}|^2  \mathrm{d}{ x}=\frac{1}{2}\int (E_x^2+|{\mathbf E_\perp}|^2 ) \mathrm{d}{ x}, \\
+\mathcal{H}_{2} &amp;= \int_{\Omega}  \mathfrak{h} f_2 \frac{\partial A_z}{\partial x} \mathrm{d}x\mathrm{d}p,\\
+\mathcal{H}_{3} &amp;= \int_{\Omega}  -\mathfrak{h} f_3 \frac{\partial A_y}{\partial x} \mathrm{d}x\mathrm{d}p.
+\end{aligned} \]</p><h2 id="Subsystem-for-\\mathcal{H}_p"><a class="docs-heading-anchor" href="#Subsystem-for-\\mathcal{H}_p">Subsystem for <span>$\mathcal{H}_p$</span></a><a id="Subsystem-for-\\mathcal{H}_p-1"></a><a class="docs-heading-anchor-permalink" href="#Subsystem-for-\\mathcal{H}_p" title="Permalink"></a></h2><p>The subsystem <span>$\frac{\partial \mathcal{Z}}{\partial t} = \{ \mathcal{Z}, \mathcal{H}_p \}$</span> associated to <span>$\mathcal{H}_{p} = \frac{1}{2}\int p^2 f_0 \mathrm{d}{ x}\mathrm{d}{p}$</span> is </p><p class="math-container">\[\left\{
+\begin{aligned}
+&amp;\frac{\partial f_0}{\partial t} = \{f_0, \mathcal{H}_{p} \} = -p\frac{\partial f_0}{\partial x}, \\
+&amp;\frac{\partial \mathbf{f}}{\partial t} = \{\mathbf{f}, \mathcal{H}_{p} \}= -p\frac{\partial \mathbf{f}}{\partial x}, \\
+%&amp;\frac{\partial f_1}{\partial t} = \{f_1, \mathcal{H}_{p} \}= -p\frac{\partial f_1}{\partial x}, \\
+%&amp;\frac{\partial f_2}{\partial t} = \{f_2, \mathcal{H}_{p} \}= -p\frac{\partial f_2}{\partial x}, \\
+%&amp;\frac{\partial f_3}{\partial t} = \{f_3, \mathcal{H}_{p} \}= -p\frac{\partial f_3}{\partial x},\\
+&amp; \frac{\partial E_x}{\partial t} = \{ E_x, \mathcal{H}_{p} \} =- \int_{\mathbb{R}} p f_0\mathrm{d}{p},\\
+&amp; \frac{\partial {\mathbf E}_\perp}{\partial t} =\frac{\partial {\mathbf A}_\perp}{\partial t} =0. 
+%&amp; \frac{\partial {\mathbf E}_\perp}{\partial t} =  \{ {\mathbf E}_\perp, \mathcal{H}_{p} \}  = {\mathbf 0},\;\; \frac{\partial {\mathbf A}_\perp}{\partial t} =  \{ {\mathbf A}_\perp, \mathcal{H}_{p} \}  = {\mathbf 0}.
+\end{aligned}
+\right.\]</p><p>We denote the initial value as <span>$(f_0^0(x,p),\mathbf{f}^0(x,p), E_x^0(x),{\mathbf E}_\perp^0(x),{\mathbf A}_\perp^0(x))$</span> at time <span>$t=0$</span>. The solution at time <span>$t$</span> of this subsystem can be written explicitly, </p><p class="math-container">\[\begin{aligned}
+        &amp;f_0(x,p,t)=f_0^0(x-pt,p), \;\;  \mathbf{f}(x,p,t)=\mathbf{f}^0(x-pt,p),\\ %f_2(x,p,t)=f_2^0(x-pt,p), f_3(x,p,t)=f_3^0(x-pt,p), \\
+        &amp;E_x(x,t)=E_x^0(x)-\int_0^t\int_{\mathbb{R}} pf_0(x,p,\tau) \mathrm{d}p\mathrm{d}\tau=E_x^0(x)-\int_0^t\int_{\mathbb{R}} pf_0^0(x-p\tau,p) \mathrm{d}p\mathrm{d}\tau, \\
+        &amp;{\mathbf E}_\perp(x,t)={\mathbf E}_\perp^0(x), \;\; {\mathbf A}_\perp(x,t)={\mathbf A}_\perp^0(x). 
+    \end{aligned}\]</p><p>Next, we check that the solution propagates the Poisson equation. To do so, we assume that the Poisson equation holds initially, i.e.</p><p class="math-container">\[\frac{\partial E_x^0}{\partial x}=\int_{\mathbb{R}} f_0^0\mathrm{d}{p}-1.\]</p><p>Then we have, by differentiating the expression of <span>$E_x(t, x)$</span> with respect to <span>$x$</span> </p><p class="math-container">\[\begin{aligned}
+\frac{\partial E_x(x,t)}{\partial x}&amp;=\frac{\partial E_x^0}{\partial x}-\int_0^t\int_{\mathbb{R}} p\frac{\partial f_0^0(x-p\tau,p)}{\partial x} \mathrm{d}p\mathrm{d}\tau=\frac{\partial E_x^0}{\partial x}+\int_0^t\int_{\mathbb{R}} \frac{\partial f_0^0(x-p\tau,p)}{\partial \tau} \mathrm{d}p\mathrm{d}\tau\\
+&amp;=\frac{\partial E_x^0}{\partial x}+\int_{\mathbb{R}}  f_0^0(x-pt,p)\mathrm{d}p-\int_{\mathbb{R}}  f_0^0(x,p)\mathrm{d}p=\int_{\mathbb{R}}  f_0(x,p,t)\mathrm{d}p-1, 
+\end{aligned}\]</p><p>which proves that the Poisson equation is satisfied at time <span>$t$</span>.</p><h2 id="Subsystem-for-\\mathcal{H}_A"><a class="docs-heading-anchor" href="#Subsystem-for-\\mathcal{H}_A">Subsystem for <span>$\mathcal{H}_A$</span></a><a id="Subsystem-for-\\mathcal{H}_A-1"></a><a class="docs-heading-anchor-permalink" href="#Subsystem-for-\\mathcal{H}_A" title="Permalink"></a></h2><p>The subsystem <span>$\frac{\partial \mathcal{Z}}{\partial t} = \{ \mathcal{Z}, \mathcal{H}_A \}$</span> associated to the sub-Hamiltonian <span>$\mathcal{H}_{A} = \frac{1}{2}\int |{\mathbf A}_\perp|^2 f_0 \mathrm{d}{\mathbf x}\mathrm{d}{\mathbf p}+\frac{1}{2}\int |\frac{\partial {\mathbf A}_\perp}{\partial x}|^2 \mathrm{d}{\mathbf x}$</span> is </p><p class="math-container">\[\left\{
+\begin{aligned}
+&amp;\frac{\partial f_0}{\partial t} = \{f_0, \mathcal{H}_{A} \} = {\mathbf A}_\perp \cdot \frac{\partial {\mathbf A}_\perp}{\partial x}\frac{\partial f_0}{\partial p}, \\
+&amp;\frac{\partial {\mathbf f}}{\partial t} = \{{\mathbf f}, \mathcal{H}_{A} \}= {\mathbf A}_\perp \cdot \frac{\partial {\mathbf A}_\perp}{\partial x} \frac{\partial {\mathbf f}}{\partial p}, \\
+%&amp;\frac{\partial f_2}{\partial t} = \{f_2, \mathcal{H}_{A} \}= {\mathbf A}_\perp \cdot \frac{\partial {\mathbf A}_\perp}{\partial x} \frac{\partial f_2}{\partial p}, \\
+%&amp;\frac{\partial f_3}{\partial t} = \{f_3, \mathcal{H}_{A} \}= {\mathbf A}_\perp \cdot \frac{\partial {\mathbf A}_\perp}{\partial x} \frac{\partial f_3}{\partial p},\\
+%&amp; \frac{\partial E_x}{\partial t} = \{ E_x, \mathcal{H}_{A} \} = 0,\\
+&amp; \frac{\partial {\mathbf E}_\perp}{\partial t} =  \{ {\mathbf E}_\perp, \mathcal{H}_{A} \}  = - \frac{\partial^2 {\mathbf A}_\perp}{\partial x^2} + {\mathbf A}_\perp \int_{\mathbb{R}}  f_0  \mathrm{d}\mathrm{p},\\
+&amp; \frac{\partial E_x}{\partial t} =\frac{\partial {\mathbf A}_\perp}{\partial t} = 0. % \{ {\mathbf A}_\perp, \mathcal{H}_{A} \}  = {\mathbf 0}.
+\end{aligned}
+\right.\]</p><p>We denote by <span>$(f_0^0(x,p),{\mathbf f}^0(x,p), E_x^0(x),{\mathbf E}_\perp^0(x),{\mathbf A}_\perp^0(x))$</span> the initial value at time <span>$t=0$</span>. The exact solution at time t is,</p><p class="math-container">\[\begin{aligned}
+        &amp;f_0(x,p,t)=f_0^0 \left( x,p+t{\mathbf A}_\perp^0(x) \cdot \frac{\partial {\mathbf A}_\perp^0(x)}{\partial x}  \right) ,\\
+&amp;   {\mathbf f}(x,p,t)={\mathbf f}^0 \left( x,p+t{\mathbf A}_\perp^0(x) \cdot \frac{\partial {\mathbf A}_\perp^0(x)}{\partial x}  \right), \\
+        &amp;{\mathbf E}_\perp(x,t)={\mathbf E}_\perp^0(x)-t\frac{\partial^2 {\mathbf A}_\perp^0(x)}{\partial x^2} +t{\mathbf A}_\perp^0(x)\int_{\mathbb{R}} f_0^0(x,p) \mathrm{d}p, \\
+        &amp;E_x(x,t)=E_x^0(x), \;\; {\mathbf A}_\perp(x,t)={\mathbf A}_\perp^0(x), \\
+\end{aligned}\]</p><h2 id="Subsystem-for-\\mathcal{H}_E"><a class="docs-heading-anchor" href="#Subsystem-for-\\mathcal{H}_E">Subsystem for <span>$\mathcal{H}_E$</span></a><a id="Subsystem-for-\\mathcal{H}_E-1"></a><a class="docs-heading-anchor-permalink" href="#Subsystem-for-\\mathcal{H}_E" title="Permalink"></a></h2><p>The subsystem <span>$\frac{\partial \mathcal{Z}}{\partial t} = \{ \mathcal{Z}, \mathcal{H}_E \}$</span> associated to the sub-Hamiltonian <span>$\mathcal{H}_{E} = \frac{1}{2}\int |{\mathbf E}|^2  \mathrm{d}{\mathbf x}$</span> is </p><p class="math-container">\[\left\{
+\begin{aligned}
+&amp;\frac{\partial f_0}{\partial t} = \{f_0, \mathcal{H}_{E} \} = -E_x \frac{\partial f_0}{\partial p}, \\
+&amp;\frac{\partial {\mathbf f}}{\partial t} = \{{\mathbf f}, \mathcal{H}_{E} \}= -E_x \frac{\partial {\mathbf f}}{\partial p}, \\
+%&amp;\frac{\partial f_2}{\partial t} = \{f_2, \mathcal{H}_{E} \}= -E_x \frac{\partial f_2}{\partial p}, \\
+%&amp;\frac{\partial f_3}{\partial t} = \{f_3, \mathcal{H}_{E} \}=-E_x \frac{\partial f_3}{\partial p},\\
+%&amp; \frac{\partial E_x}{\partial t} = \{ E_x, \mathcal{H}_{E} \} = 0,\\
+&amp; \frac{\partial {\mathbf E}_\perp}{\partial t} =  \{ {\mathbf E}_\perp, \mathcal{H}_{E} \}  = {\mathbf 0},\\
+&amp; \frac{\partial E_x}{\partial t} = \frac{\partial {\mathbf A}_\perp}{\partial t} = 0. % \{ {\mathbf A}_\perp, \mathcal{H}_{E} \}  =  -{\mathbf E}_\perp.
+\end{aligned}
+\right.\]</p><p>With the initial value<span>$(f_0^0(x,p),{\mathbf f}^0(x,p),E_x^0(x),{\mathbf E}_\perp^0(x),{\mathbf A}_\perp^0(x))$</span> at time <span>$t=0$</span>, the solution at time t is as follows, </p><p class="math-container">\[\begin{aligned}
+&amp; f_0(x,p,t)=f_0^0 ( x,p-tE_x^0(x) ), \\
+&amp; {\mathbf f}(x,p,t)={\mathbf f}^0 ( x,p-tE_x^0(x) ),  \\
+&amp; E_x(x,t)=E_x^0(x), \\
+&amp; {\mathbf E}_\perp(x,t)={\mathbf E}_\perp^0(x), \\
+&amp; {\mathbf A}_\perp(x,t)={\mathbf A}_\perp^0(x) -t{\mathbf E}_\perp^0(x).
+\end{aligned}\]</p><h2 id="Subsystem-for-\\mathcal{H}_2"><a class="docs-heading-anchor" href="#Subsystem-for-\\mathcal{H}_2">Subsystem for <span>$\mathcal{H}_2$</span></a><a id="Subsystem-for-\\mathcal{H}_2-1"></a><a class="docs-heading-anchor-permalink" href="#Subsystem-for-\\mathcal{H}_2" title="Permalink"></a></h2><p>The subsystem <span>$\frac{\partial \mathcal{Z}}{\partial t} = \{ \mathcal{Z}, \mathcal{H}_2 \}$</span> associated to the sub-Hamiltonian <span>$\mathcal{H}_{2} = \int_{\Omega}  \mathfrak{h} f_2 \frac{\partial A_z}{\partial x} \mathrm{d}x\mathrm{d}p$</span> is </p><p class="math-container">\[\left\{
+\begin{aligned}
+&amp;\frac{\partial f_0}{\partial t} = \{f_0, \mathcal{H}_{2} \} = \mathfrak{h}\frac{\partial^2 A_z}{\partial x^2}\frac{\partial f_2}{\partial p},  \\
+&amp;\frac{\partial f_1}{\partial t} = \{f_1, \mathcal{H}_{2} \}= \frac{\partial A_z }{\partial x}  f_3, \\
+&amp;\frac{\partial f_2}{\partial t} = \{f_2, \mathcal{H}_{2} \}= {{\frac{\mathfrak{h}}{3}}} \frac{\partial^2 A_z}{\partial x^2}\frac{\partial f_0}{\partial p}, \\
+&amp;\frac{\partial f_3}{\partial t} = \{f_3, \mathcal{H}_{2} \}= -\frac{\partial A_z }{\partial x} f_1,\\
+&amp; \frac{\partial { E}_z}{\partial t} =  \{ {E}_z, \mathcal{H}_{2} \}  =-\mathfrak{h}{ \int_{\mathbb{R}}  \frac{\partial f_2}{\partial x}\mathrm{d}{p}},\\
+&amp; \frac{\partial E_x}{\partial t} =\frac{\partial { E}_y}{\partial t} =\frac{\partial {\mathbf A}_\perp}{\partial t} =0. 
+\end{aligned}
+\right.\]</p><p>In this subsystem, we observe some coupling between the distribution functions. To write down the exact solution, we reformulate the equations on <span>$(f_0, {\mathbf f})$</span> as, using <span>$A_z(x, t)=A_z^0(x)$</span></p><p class="math-container">\[    \begin{aligned}
+    &amp; \partial_t    \begin{pmatrix}
+            f_1  \\
+            f_3
+        \end{pmatrix}-\frac{\partial A_z^0 }{\partial x} J \begin{pmatrix}
+f_1  \\
+f_3
+\end{pmatrix} =0,  \\
+&amp; \partial_t    \begin{pmatrix}
+    f_0 \\
+    f_2
+\end{pmatrix}-\mathfrak{h}\frac{\partial^2 A_z^0}{\partial x^2} \begin{pmatrix}
+    0 &amp; 1 \\
+    \frac{1}{3}&amp; 0
+\end{pmatrix} \partial_p    \begin{pmatrix}
+f_0 \\
+f_2
+\end{pmatrix} =0, \\
+    \end{aligned}\]</p><p>where <span>$J$</span> denotes the symplectic matrix</p><p class="math-container">\[J=\begin{pmatrix}
+    0 &amp; 1 \\
+-1 &amp; 0
+\end{pmatrix}.\]</p><p>With the initial value <span>$(f_0^0(x,p),{\mathbf f}^0(x,p),E_x^0(x),{\mathbf E}_\perp^0(x),{\mathbf A}_\perp^0(x))$</span> at time <span>$t=0$</span>, the exact solution for the first system is</p><p class="math-container">\[\begin{pmatrix}
+            f_1  \\
+            f_3
+        \end{pmatrix}(x,p,t)=\exp{\left(\frac{\partial A_z^0(x) }{\partial x} J t\right)}\begin{pmatrix}
+f_1^0(x,p)  \\
+f_3^0(x,p)
+\end{pmatrix},\  \text{with}\ \exp{(Js)}=\begin{pmatrix}
+    \cos(s) &amp; \sin(s) \\
+-\sin(s) &amp; \cos(s)
+\end{pmatrix}.\]</p><p>Let us now focus on the second system</p><p class="math-container">\[\partial_t  \begin{pmatrix}
+    f_0 \\
+    f_2
+\end{pmatrix}-\mathfrak{h}\frac{\partial^2 A_z^0}{\partial x^2} \begin{pmatrix}
+    0 &amp; 1 \\
+    \frac{1}{3}&amp; 0
+\end{pmatrix} \partial_p    \begin{pmatrix}
+f_0 \\
+f_2
+\end{pmatrix} =0. \]</p><p>By the eigen-decomposition </p><p class="math-container">\[\begin{pmatrix}
+    \frac{1}{2} &amp; \frac{\sqrt{3}}{2} \\
+    \frac{1}{2}&amp; -\frac{\sqrt{3}}{2}
+\end{pmatrix}
+\begin{pmatrix}
+    0 &amp; 1 \\
+    \frac{1}{3}&amp; 0
+\end{pmatrix}
+\begin{pmatrix}
+    1 &amp; 1 \\
+    \frac{1}{\sqrt{3}}&amp; \frac{-1}{\sqrt{3}}
+\end{pmatrix}
+=\begin{pmatrix}
+\frac{1}{\sqrt{3}}&amp; 0 \\
+    0&amp; -\frac{1}{\sqrt{3}}
+\end{pmatrix},\]</p><p>then, one can diagonalize the transport equation to get</p><p class="math-container">\[\partial_t  \begin{pmatrix}
+    \frac{1}{2}f_0+\frac{\sqrt{3}}{2}f_2 \\
+    \frac{1}{2}f_0-\frac{\sqrt{3}}{2}f_2 
+\end{pmatrix}- 
+\frac{\mathfrak{h}}{\sqrt{3}}\frac{\partial^2 A_z^0}{\partial x^2}
+\begin{pmatrix}
+    1 &amp; 0 \\
+    0&amp; -1
+\end{pmatrix} \partial_p    \begin{pmatrix}
+    \frac{1}{2}f_0+\frac{\sqrt{3}}{2}f_2 \\
+    \frac{1}{2}f_0-\frac{\sqrt{3}}{2}f_2 
+\end{pmatrix} =0.
+\]</p><p>Thus, we can solve the transport equation</p><p class="math-container">\[\Big(\frac{1}{2}f_0\pm\frac{\sqrt{3}}{2}f_2\Big)(x,p,t)=\Big(\frac{1}{2}f_0^0 \pm\frac{\sqrt{3}}{2}f_2^0\Big)( x,p\pm t\frac{\mathfrak{h}}{\sqrt{3}}\frac{\partial^2 A_z^0}{\partial x^2}(x)),\]</p><p>and compute the exact solution at time <span>$t$</span> as follows, </p><p class="math-container">\[\begin{aligned}
+        &amp;f_1(x,p,t)=\cos(t \frac{\partial A_z^0(x) }{\partial x} )f_1^0 ( x,p)+\sin(t \frac{\partial A_z^0(x) }{\partial x} )f_3^0 ( x,p), \\
+        &amp;f_3(x,p,t)=-\sin(t \frac{\partial A_z^0(x) }{\partial x} )f_1^0 ( x,p)+\cos(t \frac{\partial A_z^0(x) }{\partial x} )f_3^0 ( x,p) \\
+        &amp;f_0(x,p,t)=\Big(\frac{1}{2}f_0^0 +\frac{\sqrt{3}}{2}f_2^0\Big)( x,p+t\frac{\mathfrak{h}}{\sqrt{3}}\frac{\partial^2 A_z^0}{\partial x^2}(x) )+\Big(\frac{1}{2}f_0^0 -\frac{\sqrt{3}}{2}f_2^0\Big)( x,p-t\frac{\mathfrak{h}}{\sqrt{3}}\frac{\partial^2 A_z^0}{\partial x^2}(x) ),\\
+        &amp;f_2(x,p,t)=\frac{1}{\sqrt{3}}\Big(\frac{1}{2}f_0^0 +\frac{\sqrt{3}}{2}f_2^0\Big)( x,p+t\frac{\mathfrak{h}}{\sqrt{3}}\frac{\partial^2 A_z^0}{\partial x^2}(x) )-\frac{1}{\sqrt{3}}\Big(\frac{1}{2}f_0^0 -\frac{\sqrt{3}}{2}f_2^0\Big)( x,p-t\frac{\mathfrak{h}}{\sqrt{3}}\frac{\partial^2 A_z^0}{\partial x^2}(x) ),\\
+        &amp;{\mathbf A}_\perp(x,t)={\mathbf A}_\perp^0(x), E_x(x,t)=E_x^0(x), E_y(x,t)=E_y^0(x),\\
+        &amp;E_z(x,t)=E_z^0(x)-t\mathfrak{h}\int_{\mathbb{R}} \frac{\partial f_2^0}{\partial x}\mathrm{d}{p}.
+    \end{aligned}\]</p><h2 id="Subsystem-for-\\mathcal{H}_3"><a class="docs-heading-anchor" href="#Subsystem-for-\\mathcal{H}_3">Subsystem for <span>$\mathcal{H}_3$</span></a><a id="Subsystem-for-\\mathcal{H}_3-1"></a><a class="docs-heading-anchor-permalink" href="#Subsystem-for-\\mathcal{H}_3" title="Permalink"></a></h2><p>The subsystem <span>$\frac{\partial \mathcal{Z}}{\partial t} = \{ \mathcal{Z}, \mathcal{H}_3 \}$</span> associated to the sub-Hamiltonian <span>$\mathcal{H}_{3} = -\int_{\Omega} \mathfrak{h} f_3 \frac{\partial A_y}{\partial x} \mathrm{d}x\mathrm{d}p$</span> is </p><p class="math-container">\[\left\{
+\begin{aligned}
+&amp;\frac{\partial f_0}{\partial t} = \{f_0, \mathcal{H}_{3} \} = -\mathfrak{h}\frac{\partial^2 A_y}{\partial x^2} \frac{\partial f_3}{\partial p},  \\
+&amp;\frac{\partial f_1}{\partial t} = \{f_1, \mathcal{H}_{3} \}=  \frac{\partial A_y }{\partial x} f_2, \\
+&amp;\frac{\partial f_2}{\partial t} = \{f_2, \mathcal{H}_{3} \}= - \frac{\partial A_y }{\partial x} f_1,\\
+&amp;\frac{\partial f_3}{\partial t} =- \{f_3, \mathcal{H}_{3} \}= -{{\frac{\mathfrak{h}}{3}}} \frac{\partial^2 A_y}{\partial x^2} \frac{\partial f_0}{\partial p}, \\
+&amp; \frac{\partial { E}_y}{\partial t} =  \{ {E}_y, \mathcal{H}_{3} \}  = {\mathfrak{h} \int_{\mathbb{R}}  \frac{\partial f_3}{\partial x}\mathrm{d}{p}},\\
+&amp; \frac{\partial E_x}{\partial t} = \frac{\partial { E}_z}{\partial t} = \frac{\partial {\mathbf A}_\perp}{\partial t} =0. 
+\end{aligned}
+\right.\]</p><p>This subsystem is very similar to the <span>$\mathcal{H}_2$</span> one, hence, as previously, we reformulate the equations on the distribution functions as </p><p class="math-container">\[\begin{aligned}
+        &amp; \partial_t    \begin{pmatrix}
+            f_1  \\
+            f_2
+        \end{pmatrix}
+        -\frac{\partial A_y^0 }{\partial x} J 
+        %\begin{pmatrix}
+    %       0 &amp; -1 \\
+%           1 &amp; 0
+        %\end{pmatrix} 
+        \begin{pmatrix}
+        f_1  \\
+        f_2
+    \end{pmatrix} =0, \\
+        &amp; \partial_t    \begin{pmatrix}
+            f_0 \\
+            f_3
+        \end{pmatrix}+\mathfrak{h}\frac{\partial^2 A_y^0}{\partial x^2} \begin{pmatrix}
+            0 &amp; 1 \\
+            \frac{1}{3}&amp; 0
+        \end{pmatrix} \partial_p    \begin{pmatrix}
+            f_0 \\
+            f_3
+        \end{pmatrix} =0, \\
+    %&amp; \frac{\partial E_x}{\partial t}= 0,\ 
+ %\frac{\partial { E}_y}{\partial t} =   {\mathfrak{h} \int_{\mathbb{R}}  \frac{\partial f_3}{\partial x}\mathrm{d}{p}},\\
+    %&amp; \frac{\partial { E}_z}{\partial t} =  \{ {E}_z, H_{3} \}  = { 0},\ 
+     %\frac{\partial {\mathbf A}_\perp}{\partial t} =  \{ {\mathbf A}_\perp, H_{3} \}  =  0,
+    \end{aligned}\]</p><p>with initial value</p><p><span>$(f_0^0(x,p),{\mathbf f}^0(x,p),E_x^0(x),{\mathbf E}_\perp^0(x),{\mathbf A}_\perp^0(x))$</span> at time <span>$t=0$</span>. We derive similar formula with <span>$\mathcal{H}_2$</span> for the exact solution at time <span>$t$</span> </p><p class="math-container">\[\begin{aligned}
+        &amp;f_1(x,p,t)=\cos(t \frac{\partial A_y^0(x) }{\partial x} )f_1^0 ( x,p)+\sin(t \frac{\partial A_y^0(x) }{\partial x} )f_2^0 ( x,p), \\
+        &amp;f_2(x,p,t)=-\sin(t \frac{\partial A_y^0(x) }{\partial x} )f_1^0 ( x,p)+\cos(t \frac{\partial A_y^0(x) }{\partial x} )f_2^0 ( x,p), \\
+        &amp;f_0(x,p,t)=\Big(\frac{1}{2}f_0^0 +\frac{\sqrt{3}}{2}f_3^0\Big)( x,p-t\frac{\mathfrak{h}}{\sqrt{3}}\frac{\partial^2 A_y^0}{\partial x^2}(x) )+\Big(\frac{1}{2}f_0^0 -\frac{\sqrt{3}}{2}f_3^0\Big)( x,p+t\frac{\mathfrak{h}}{\sqrt{3}}\frac{\partial^2 A_y^0}{\partial x^2}(x) ),\\
+        &amp;f_3(x,p,t)=\frac{1}{\sqrt{3}}\Big(\frac{1}{2}f_0^0 +\frac{\sqrt{3}}{2}f_3^0\Big)( x,p-t\frac{\mathfrak{h}}{\sqrt{3}}\frac{\partial^2 A_y^0}{\partial x^2}(x) )-\frac{1}{\sqrt{3}}\Big(\frac{1}{2}f_0^0 -\frac{\sqrt{3}}{2}f_3^0\Big)( x,p+t\frac{\mathfrak{h}}{\sqrt{3}}\frac{\partial^2 A_y^0}{\partial x^2}(x) ),
+    \end{aligned} \]</p><p class="math-container">\[\begin{aligned}
+&amp; E_y(x,t)=E_y^0(x)+t\mathfrak{h}\int_{\mathbb{R}} \frac{\partial f_3^0}{\partial x}\mathrm{d}{p}, \\
+&amp; {\mathbf A}_\perp(x,t)={\mathbf A}_\perp^0(x), \\
+&amp; E_x(x,t)=E_x^0(x), \\
+&amp; E_z(x,t)=E_z^0(x). 
+\end{aligned} \]</p><p>To compute the solution <span>$E_y(x,t)$</span>, we use the fact that</p><p class="math-container">\[\int_{\mathbb{R}} f_3(x,p,t) \mathrm{d}p =\int_{\mathbb{R}} f_3^0(x,p)\mathrm{d} p.\]</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../numerical_scheme/">Numerical scheme »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.3.0 on <span class="colophon-date" title="Sunday 7 April 2024 10:57">Sunday 7 April 2024</span>. Using Julia version 1.10.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
