@@ -95,7 +95,7 @@ function advection!(f, adv::BSplineAdvection, v, dt)
         for i = -div(adv.p - 1, 2):div(adv.p + 1, 2)
             adv.eigalpha .+= (
                 bspline(adv.p, i - div(adv.p + 1, 2), beta) .*
-                exp.((ishift + i) * 1im .* adv.modes)
+                cis.((ishift + i) .* adv.modes)
             )
         end
 

@@ -73,7 +73,7 @@ function step!(
     v = op.mesh.vnode 
 
     for j in eachindex(v), i in eachindex(k)
-        op.ev[i,j] = exp(-1im * k[i] * v[j] * dt)
+        op.ev[i,j] = cis(- k[i] * v[j] * dt)
     end
 
     @sync begin
