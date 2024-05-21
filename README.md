@@ -8,7 +8,7 @@
 
 ## Cite
 
-Nicolas Crouseilles, Paul-Antoine Hervieux, Xue Hong, Giovanni Manfredi. Vlasov-Maxwell equations with spin effects. 2023. [hal-03960201](https://hal.inria.fr/hal-03960201/)
+Crouseilles N, Hervieux P-A, Hong X, Manfredi G. Vlasov–Maxwell equations with spin effects. Journal of Plasma Physics. 2023;89(2):905890215. doi:10.1017/S0022377823000314
 
 ## Installation
 
